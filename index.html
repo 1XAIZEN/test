@@ -155,7 +155,8 @@
     .card-meta {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
+      gap: 12px;
       margin-bottom: 24px;
     }
 
@@ -163,6 +164,7 @@
       font-family: var(--mono);
       font-size: 11px;
       color: var(--text-muted);
+      flex-shrink: 0;
     }
 
     .item-stock {
@@ -170,33 +172,47 @@
       font-size: 11px;
       color: var(--text-dim);
       display: flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
+      flex-direction: column;
+      align-items: flex-end;
+      text-align: right;
+      line-height: 1.35;
     }
 
-    .item-stock::before {
+    .stock-main {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+
+    .stock-main::before {
       content: '';
-      width: 5px;
-      height: 5px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       background: var(--green);
       flex-shrink: 0;
     }
 
-    .item-stock.rented {
+    .stock-sub {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .item-stock.rented .stock-main {
       color: var(--yellow);
     }
 
-    .item-stock.rented::before {
+    .item-stock.rented .stock-main::before {
       background: var(--yellow);
     }
 
-    .item-stock.empty {
+    .item-stock.empty .stock-main {
       color: var(--text-muted);
     }
 
-    .item-stock.empty::before {
+    .item-stock.empty .stock-main::before {
       background: var(--text-muted);
     }
 
@@ -347,14 +363,22 @@
       }
     }
 
-    // Формат: "02.09 в 15:00"
-    function formatShortDate(dateObj) {
-      const pad = (n) => String(n).padStart(2, '0');
-      const day = pad(dateObj.getDate());
-      const month = pad(dateObj.getMonth() + 1);
-      const hours = pad(dateObj.getHours());
-      const minutes = pad(dateObj.getMinutes());
-      return `${day}.${month} в ${hours}:${minutes}`;
+    function formatTimeLeft(targetDate) {
+      const diffMs = targetDate - new Date();
+      if (diffMs <= 0) return 'сейчас';
+
+      const diffMins = Math.floor(diffMs / 60000);
+      const days = Math.floor(diffMins / (60 * 24));
+      const hours = Math.floor((diffMins % (60 * 24)) / 60);
+      const mins = diffMins % 60;
+
+      if (days > 0) {
+        return hours > 0 ? `через ${days} д ${hours} ч` : `через ${days} д`;
+      }
+      if (hours > 0) {
+        return mins > 0 ? `через ${hours} ч ${mins} мин` : `через ${hours} ч`;
+      }
+      return `через ${mins} мин`;
     }
 
     function calculateStatus(totalStock, rentsList = []) {
@@ -366,35 +390,39 @@
 
       const rentedCount = validRents.length;
       const availableStock = Math.max(0, totalStock - rentedCount);
-      const nextAvailableDate = validRents.length > 0 ? formatShortDate(validRents[0]) : null;
+      const nextDate = validRents.length > 0 ? validRents[0] : null;
 
-      // Если в наличии ничего нет, но есть дата возврата
-      if (availableStock === 0 && nextAvailableDate) {
+      // 1. Все сдано в аренду (в наличии 0, но скоро освободится)
+      if (availableStock === 0 && nextDate) {
         return {
-          text: `До ${nextAvailableDate}`,
+          main: 'Занято',
+          sub: `Освободится ${formatTimeLeft(nextDate)}`,
           className: 'rented'
         };
       }
 
-      // Если товара нет вообще
+      // 2. Нет в наличии вообще (пустой склад)
       if (availableStock === 0) {
         return {
-          text: 'Нет в наличии',
+          main: 'Нет в наличии',
+          sub: '',
           className: 'empty'
         };
       }
 
-      // Если в наличии есть, но часть сдана
+      // 3. Часть доступна, часть в аренде
       if (rentedCount > 0) {
         return {
-          text: `Доступно: ${availableStock} шт. (ближ аренда слетит ${nextAvailableDate})`,
+          main: `В наличии: ${availableStock} из ${totalStock} шт.`,
+          sub: `След. возврат ${formatTimeLeft(nextDate)}`,
           className: ''
         };
       }
 
-      // Все в наличии
+      // 4. Свободно всё
       return {
-        text: `${availableStock} шт.`,
+        main: `В наличии: ${availableStock} шт.`,
+        sub: '',
         className: ''
       };
     }
@@ -423,9 +451,10 @@
         card.innerHTML = `
           <div class="card-meta">
             <span class="item-id">#${item.id}</span>
-            <span class="item-stock ${status.className}">
-              ${status.text}
-            </span>
+            <div class="item-stock ${status.className}">
+              <span class="stock-main">${status.main}</span>
+              ${status.sub ? `<span class="stock-sub">${status.sub}</span>` : ''}
+            </div>
           </div>
 
           <div class="image-stage">
