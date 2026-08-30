@@ -3,24 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Market & Rental with 3D Preview</title>
+  <title>Админ-Маркет: Скины & Мечи</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      --bg-main: #0b0e14;
-      --bg-card: #151a23;
-      --bg-model: #000;
-      --accent-purple: #7c3aed;
+      --bg-main: #07090e;
+      --bg-card: #111622;
+      --accent-purple: #9333ea;
       --accent-cyan: #06b6d4;
       --accent-blue: #3b82f6;
-      --accent-ice: #e0f2fe;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
-      --border-color: #262f3f;
-      --card-radius: 16px;
+      --border-color: #1e293b;
+      --card-radius: 18px;
     }
 
     * {
@@ -34,7 +32,8 @@
       background-color: var(--bg-main);
       color: var(--text-main);
       line-height: 1.5;
-      padding-bottom: 60px;
+      padding-bottom: 70px;
+      overflow-x: hidden;
     }
 
     .container {
@@ -44,9 +43,9 @@
     }
 
     header {
-      padding: 40px 0 30px;
+      padding: 40px 0 25px;
       border-bottom: 1px solid var(--border-color);
-      margin-bottom: 40px;
+      margin-bottom: 35px;
     }
 
     .title-block h1 {
@@ -58,46 +57,88 @@
       letter-spacing: -0.5px;
     }
 
+    .title-block p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
     .market-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-      gap: 30px;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 26px;
+    }
+
+    /* 3D Card Structure */
+    .card-wrapper {
+      perspective: 1000px;
     }
 
     .card {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: var(--card-radius);
-      padding: 24px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
-      transition: transform 0.2s;
+      justify-content: space-between;
+      transform-style: preserve-3d;
+      transition: transform 0.1s ease-out, border-color 0.3s, box-shadow 0.3s;
+      position: relative;
     }
 
     .card:hover {
-      transform: translateY(-4px);
+      border-color: rgba(147, 51, 234, 0.4);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
     }
 
-    .model-container {
+    /* 3D Visual Box */
+    .viewer-box {
       width: 100%;
-      height: 300px;
-      background-color: var(--bg-model);
+      height: 380px;
+      background: radial-gradient(circle at 50% 30%, #1e293b 0%, #0a0d14 85%);
       border-radius: 12px;
-      margin-bottom: 16px;
+      overflow: hidden;
       position: relative;
+      margin-bottom: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      justify-content: center;
+      align-items: center;
       cursor: grab;
-      border: 1px solid rgba(255,255,255,0.05);
+      transform-style: preserve-3d;
     }
 
-    .model-error {
+    .viewer-box:active {
+      cursor: grabbing;
+    }
+
+    .model-img {
+      max-height: 90%;
+      max-width: 90%;
+      object-fit: contain;
+      filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.8));
+      transition: transform 0.15s ease-out;
+      pointer-events: none;
+      transform: translateZ(45px);
+    }
+
+    /* Glare effect */
+    .glare {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: #ef4444;
-      font-size: 14px;
-      text-align: center;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.08) 0%, transparent 60%);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .card-badge-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      transform: translateZ(20px);
     }
 
     .badge {
@@ -105,127 +146,394 @@
       border-radius: 6px;
       font-size: 12px;
       font-weight: 700;
+      letter-spacing: 0.3px;
     }
 
     .badge-stock {
       background: rgba(6, 182, 212, 0.15);
       color: var(--accent-cyan);
+      border: 1px solid rgba(6, 182, 212, 0.3);
     }
 
     .badge-buff {
-      background: rgba(124, 58, 237, 0.15);
+      background: rgba(147, 51, 234, 0.15);
       color: #c084fc;
+      border: 1px solid rgba(147, 51, 234, 0.3);
+    }
+
+    .badge-frost {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .card h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      transform: translateZ(25px);
     }
 
     .rates-box {
-      margin-top: 16px;
       background: rgba(11, 14, 20, 0.6);
       border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 14px;
+      transform: translateZ(15px);
     }
 
     .rate-row {
       display: flex;
       justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
       font-size: 13px;
+    }
+
+    .rate-row:last-child {
+      border-bottom: none;
+    }
+
+    .rate-duration {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .rate-val {
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .hint-3d {
+      position: absolute;
+      bottom: 10px;
+      font-size: 11px;
+      color: #64748b;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 3px 8px;
+      border-radius: 6px;
+      backdrop-filter: blur(4px);
     }
   </style>
 </head>
 <body>
+
   <div class="container">
     <header>
       <div class="title-block">
         <h1>Админ-Маркет: Скины & Мечи</h1>
-        <p>3D-просмотр и актуальные цены</p>
+        <p>Интерактивный 3D-просмотр и актуальные цены на аренду</p>
       </div>
     </header>
-    <div class="market-grid" id="market-container">
-      Загрузка моделей и цен...
+
+    <div class="market-grid" id="market-grid">
+      <!-- Скин 1: Женский -->
+      <div class="card-wrapper">
+        <div class="card">
+          <div>
+            <div class="viewer-box">
+              <div class="glare"></div>
+              <!-- SVG визуализация персонажа (Ж) -->
+              <svg class="model-img" viewBox="0 0 200 420" xmlns="http://www.w3.org/2000/svg">
+                <!-- Hair sticks -->
+                <line x1="85" y1="45" x2="60" y2="15" stroke="#ca8a04" stroke-width="3" />
+                <line x1="115" y1="45" x2="140" y2="15" stroke="#ca8a04" stroke-width="3" />
+                <!-- Hair buns -->
+                <circle cx="70" cy="50" r="20" fill="#18181b" />
+                <circle cx="130" cy="50" r="20" fill="#18181b" />
+                <!-- Head -->
+                <ellipse cx="100" cy="70" rx="26" ry="32" fill="#fed7aa" />
+                <path d="M 75 60 Q 100 45 125 60" fill="#18181b" />
+                <ellipse cx="90" cy="68" rx="3" ry="2" fill="#3f3f46" />
+                <ellipse cx="110" cy="68" rx="3" ry="2" fill="#3f3f46" />
+                <path d="M 95 82 Q 100 86 105 82" stroke="#e11d48" stroke-width="2" fill="none" />
+                <!-- Body (Black Longsleeve) -->
+                <path d="M 78 100 L 122 100 L 132 170 L 68 170 Z" fill="#09090b" />
+                <!-- Admin Team Logo -->
+                <polygon points="96,120 104,115 102,126" fill="#38bdf8" />
+                <polygon points="102,126 108,122 105,130" fill="#f43f5e" />
+                <!-- Arms -->
+                <path d="M 78 102 L 55 180 L 65 182 L 84 115 Z" fill="#09090b" />
+                <path d="M 122 102 L 145 180 L 135 182 L 116 115 Z" fill="#09090b" />
+                <ellipse cx="53" cy="190" rx="7" ry="10" fill="#fed7aa" />
+                <ellipse cx="147" cy="190" rx="7" ry="10" fill="#fed7aa" />
+                <!-- Belt -->
+                <rect x="70" y="168" width="60" height="8" fill="#18181b" />
+                <circle cx="100" cy="172" r="5" fill="none" stroke="#e4e4e7" stroke-width="2" />
+                <!-- White Pants -->
+                <path d="M 68 176 Q 60 210 74 340 L 97 340 L 99 220 L 101 220 L 103 340 L 126 340 Q 140 210 132 176 Z" fill="#f1f5f9" />
+                <!-- Boots -->
+                <rect x="73" y="340" width="24" height="20" rx="4" fill="#09090b" />
+                <rect x="103" y="340" width="24" height="20" rx="4" fill="#09090b" />
+              </svg>
+              <div class="hint-3d">🖱️ Наведи для 3D вращения</div>
+            </div>
+
+            <div class="card-badge-row">
+              <span class="badge badge-stock">В наличии: 5 шт.</span>
+              <span class="badge badge-buff">ADM Квесты +40%</span>
+            </div>
+            <h2>Админ Скин (Ж)</h2>
+          </div>
+
+          <div class="rates-box">
+            <div class="rate-row">
+              <span class="rate-duration">Сутки</span>
+              <span class="rate-val">15 АЗП / 7.000.000$</span>
+            </div>
+            <div class="rate-row">
+              <span class="rate-duration">7 суток</span>
+              <span class="rate-val">105 АЗП / 49.000.000$</span>
+            </div>
+            <div class="rate-row">
+              <span class="rate-duration">30 суток</span>
+              <span class="rate-val">450 АЗП / 210.000.000$</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Скин 2: Мужской (Синий) -->
+      <div class="card-wrapper">
+        <div class="card">
+          <div>
+            <div class="viewer-box">
+              <div class="glare"></div>
+              <svg class="model-img" viewBox="0 0 200 420" xmlns="http://www.w3.org/2000/svg">
+                <!-- Head & Balaclava Mask -->
+                <ellipse cx="100" cy="70" rx="27" ry="32" fill="#09090b" />
+                <!-- Skull pattern -->
+                <ellipse cx="100" cy="73" rx="19" ry="20" fill="#f8fafc" />
+                <ellipse cx="91" cy="70" rx="5" ry="6" fill="#09090b" />
+                <ellipse cx="109" cy="70" rx="5" ry="6" fill="#09090b" />
+                <path d="M 94 85 L 94 92 M 98 85 L 98 92 M 102 85 L 102 92 M 106 85 L 106 92" stroke="#09090b" stroke-width="2" />
+                <!-- Dark Blue Admin T-Shirt -->
+                <path d="M 65 105 L 135 105 L 145 220 L 55 220 Z" fill="#1e293b" />
+                <!-- T-shirt Text ADMIN TEAM -->
+                <text x="100" y="150" font-family="'Inter', sans-serif" font-weight="900" font-size="14" fill="#ffffff" text-anchor="middle">ADMIN</text>
+                <text x="100" y="168" font-family="'Inter', sans-serif" font-weight="900" font-size="14" fill="#ffffff" text-anchor="middle">TEAM</text>
+                <!-- Arms -->
+                <path d="M 65 107 L 35 175 L 50 178 L 73 125 Z" fill="#1e293b" />
+                <path d="M 135 107 L 165 175 L 150 178 L 127 125 Z" fill="#1e293b" />
+                <path d="M 38 175 L 34 220 L 46 220 L 49 178 Z" fill="#fed7aa" />
+                <path d="M 162 175 L 166 220 L 154 220 L 151 178 Z" fill="#fed7aa" />
+                <!-- Gloves -->
+                <rect x="29" y="218" width="18" height="24" rx="4" fill="#334155" />
+                <rect x="153" y="218" width="18" height="24" rx="4" fill="#334155" />
+                <!-- Dark Denim Jeans -->
+                <path d="M 55 220 L 145 220 L 138 350 L 105 350 L 100 240 L 95 350 L 62 350 Z" fill="#334155" />
+                <!-- Boots -->
+                <rect x="58" y="348" width="28" height="20" rx="5" fill="#0f172a" />
+                <rect x="114" y="348" width="28" height="20" rx="5" fill="#0f172a" />
+              </svg>
+              <div class="hint-3d">🖱️ Наведи для 3D вращения</div>
+            </div>
+
+            <div class="card-badge-row">
+              <span class="badge badge-stock">В наличии: 5 шт.</span>
+              <span class="badge badge-buff">x2 Зарплата</span>
+            </div>
+            <h2>Админ Скин (М, Синий)</h2>
+          </div>
+
+          <div class="rates-box">
+            <div class="rate-row">
+              <span class="rate-duration">Сутки</span>
+              <span class="rate-val">15 АЗП / 7.000.000$</span>
+            </div>
+            <div class="rate-row">
+              <span class="rate-duration">7 суток</span>
+              <span class="rate-val">105 АЗП / 49.000.000$</span>
+            </div>
+            <div class="rate-row">
+              <span class="rate-duration">30 суток</span>
+              <span class="rate-val">450 АЗП / 210.000.000$</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Скин 3: Мужской (Чёрный) -->
+      <div class="card-wrapper">
+        <div class="card">
+          <div>
+            <div class="viewer-box">
+              <div class="glare"></div>
+              <svg class="model-img" viewBox="0 0 200 420" xmlns="http://www.w3.org/2000/svg">
+                <!-- Head & Mask -->
+                <ellipse cx="100" cy="70" rx="27" ry="32" fill="#09090b" />
+                <ellipse cx="100" cy="73" rx="19" ry="20" fill="#f1f5f9" />
+                <ellipse cx="91" cy="70" rx="5" ry="6" fill="#09090b" />
+                <ellipse cx="109" cy="70" rx="5" ry="6" fill="#09090b" />
+                <path d="M 94 85 L 94 92 M 98 85 L 98 92 M 102 85 L 102 92 M 106 85 L 106 92" stroke="#09090b" stroke-width="2" />
+                <!-- Black Admin T-Shirt -->
+                <path d="M 65 105 L 135 105 L 145 220 L 55 220 Z" fill="#09090b" />
+                <!-- T-shirt Text -->
+                <text x="100" y="150" font-family="'Inter', sans-serif" font-weight="900" font-size="14" fill="#ffffff" text-anchor="middle">ADMIN</text>
+                <text x="100" y="168" font-family="'Inter', sans-serif" font-weight="900" font-size="14" fill="#ffffff" text-anchor="middle">TEAM</text>
+                <!-- Arms -->
+                <path d="M 65 107 L 35 175 L 50 178 L 73 125 Z" fill="#09090b" />
+                <path d="M 135 107 L 165 175 L 150 178 L 127 125 Z" fill="#09090b" />
+                <path d="M 38 175 L 34 220 L 46 220 L 49 178 Z" fill="#fed7aa" />
+                <path d="M 162 175 L 166 220 L 154 220 L 151 178 Z" fill="#fed7aa" />
+                <rect x="29" y="218" width="18" height="24" rx="4" fill="#18181b" />
+                <rect x="153" y="218" width="18" height="24" rx="4" fill="#18181b" />
+                <!-- Light Blue Jeans -->
+                <path d="M 55 220 L 145 220 L 138 350 L 105 350 L 100 240 L 95 350 L 62 350 Z" fill="#475569" />
+                <!-- Boots -->
+                <rect x="58" y="348" width="28" height="20" rx="5" fill="#020617" />
+                <rect x="114" y="348" width="28" height="20" rx="5" fill="#020617" />
+              </svg>
+              <div class="hint-3d">🖱️ Наведи для 3D вращения</div>
+            </div>
+
+            <div class="card-badge-row">
+              <span class="badge badge-stock">В наличии: 2 шт.</span>
+              <span class="badge badge-buff">x2 Зарплата</span>
+            </div>
+            <h2>Админ Скин (М, Чёрный)</h2>
+          </div>
+
+          <div class="rates-box">
+            <div class="rate-row">
+              <span class="rate-duration">Сутки</span>
+              <span class="rate-val">15 АЗП / 7.000.000$</span>
+            </div>
+            <div class="rate-row">
+              <span class="rate-duration">7 суток</span>
+              <span class="rate-val">105 АЗП / 48.000.000$</span>
+            </div>
+            <div class="rate-row">
+              <span class="rate-duration">30 суток</span>
+              <span class="rate-val">450 АЗП / 210.000.000$</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ледяная Скорбь (Frostmourne) -->
+      <div class="card-wrapper">
+        <div class="card">
+          <div>
+            <div class="viewer-box">
+              <div class="glare"></div>
+              <!-- Детализированный меч с эффектом ледяного сияния -->
+              <svg class="model-img" viewBox="0 0 160 420" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="bladeGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#0284c7" />
+                    <stop offset="50%" stop-color="#e0f2fe" />
+                    <stop offset="100%" stop-color="#0284c7" />
+                  </linearGradient>
+                  <filter id="iceBloom">
+                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                  </filter>
+                </defs>
+                <!-- Pommel -->
+                <circle cx="80" cy="30" r="10" fill="#334155" stroke="#38bdf8" stroke-width="2" />
+                <!-- Grip -->
+                <rect x="76" y="40" width="8" height="50" rx="3" fill="#1e293b" stroke="#0ea5e9" stroke-width="1" />
+                <!-- Crossguard Skull & Horns -->
+                <path d="M 40 85 Q 80 110 120 85 Q 100 135 80 135 Q 60 135 40 85 Z" fill="#1e293b" stroke="#38bdf8" stroke-width="2" />
+                <!-- Skull Eye Glow -->
+                <circle cx="73" cy="110" r="2.5" fill="#38bdf8" filter="url(#iceBloom)" />
+                <circle cx="87" cy="110" r="2.5" fill="#38bdf8" filter="url(#iceBloom)" />
+                <!-- Blade -->
+                <path d="M 72 135 L 70 340 L 80 390 L 90 340 L 88 135 Z" fill="url(#bladeGlow)" filter="url(#iceBloom)" />
+                <!-- Jagged edges -->
+                <path d="M 70 180 L 60 200 L 71 215" fill="none" stroke="#38bdf8" stroke-width="2" />
+                <path d="M 90 180 L 100 200 L 89 215" fill="none" stroke="#38bdf8" stroke-width="2" />
+                <!-- Runes line -->
+                <line x1="80" y1="150" x2="80" y2="330" stroke="#bae6fd" stroke-width="2" stroke-dasharray="6,4" filter="url(#iceBloom)" />
+              </svg>
+              <div class="hint-3d">🖱️ Наведи для 3D вращения</div>
+            </div>
+
+            <div class="card-badge-row">
+              <span class="badge badge-stock">В наличии: 1 шт.</span>
+              <span class="badge badge-frost">Ледяной Урон +50</span>
+            </div>
+            <h2>Ледяная Скорбь</h2>
+          </div>
+
+          <div class="rates-box">
+            <div class="rate-row">
+              <span class="rate-duration">Сутки</span>
+              <span class="rate-val">15 АЗП / 7.000.000$</span>
+            </div>
+            <div class="rate-row">
+              <span class="rate-duration">7 суток</span>
+              <span class="rate-val">105 АЗП / 49.000.000$</span>
+            </div>
+            <div class="rate-row">
+              <span class="rate-duration">30 суток</span>
+              <span class="rate-val">450 АЗП / 210.000.000$</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/three@0.157.0/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.157.0/examples/js/loaders/GLTFLoader.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.157.0/examples/js/controls/OrbitControls.js"></script>
-
   <script>
-    const MARKET_ITEMS = [
-      { id: 1, title: "Админ Скин (Ж)", model: "female_admin", stock: "5 шт.", buff: "ADM Квесты +40%" },
-      { id: 2, title: "Админ Скин (М, Синий)", model: "male_admin_blue", stock: "3 шт.", buff: "x2 Зарплата" },
-      { id: 3, title: "Админ Скин (М, Чёрный)", model: "male_admin_black", stock: "2 шт.", buff: "x2 Зарплата" },
-      { id: 4, title: "Ледяная Скорбь", model: "frostmourne", stock: "1 шт.", buff: "Ледяной Урон +50" },
-    ];
+    // 3D Parallax & Depth Tilt Engine
+    document.querySelectorAll('.card-wrapper').forEach(wrapper => {
+      const card = wrapper.querySelector('.card');
+      const box = wrapper.querySelector('.viewer-box');
+      const img = wrapper.querySelector('.model-img');
+      const glare = wrapper.querySelector('.glare');
 
-    const RENTAL_RATES = [
-      { period: "Сутки", azp: "15 АЗП", cash: "7.000.000$" },
-      { period: "7 суток", azp: "105 АЗП", cash: "49.000.000$" },
-      { period: "30 суток", azp: "450 АЗП", cash: "210.000.000$" },
-    ];
+      let isHovered = false;
 
-    function initModel(containerId, modelFile) {
-      const container = document.getElementById(containerId);
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      renderer.setSize(container.clientWidth, container.clientHeight);
-      container.appendChild(renderer.domElement);
-
-      const controls = new THREE.OrbitControls(camera, renderer.domElement);
-      const loader = new THREE.GLTFLoader();
-
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-      scene.add(ambientLight);
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-      directionalLight.position.set(1, 1, 1);
-      scene.add(directionalLight);
-
-      loader.load(`./models/${modelFile}.glb`, (gltf) => {
-        const model = gltf.scene;
-        model.scale.set(1, 1, 1); 
-        model.position.y = -1; 
-        scene.add(model);
-        camera.position.z = 3;
-      }, undefined, (error) => {
-        container.innerHTML = '<p class="model-error">Модель не найдена.</p>';
+      box.addEventListener('mouseenter', () => {
+        isHovered = true;
+        glare.style.opacity = '1';
       });
 
-      function animate() {
-        requestAnimationFrame(animate);
-        controls.update();
-        renderer.render(scene, camera);
-      }
-      animate();
+      box.addEventListener('mousemove', (e) => {
+        const rect = box.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
 
-      window.addEventListener('resize', () => {
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        camera.aspect = container.clientWidth / container.clientHeight;
-        camera.updateProjectionMatrix();
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateX = ((y - centerY) / centerY) * -22;
+        const rotateY = ((x - centerX) / centerX) * 22;
+
+        card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        img.style.transform = `translateZ(60px) rotateY(${rotateY * 0.8}deg) scale(1.05)`;
+        
+        glare.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.18) 0%, transparent 60%)`;
       });
-    }
 
-    const container = document.getElementById("market-container");
-    container.innerHTML = MARKET_ITEMS.map((item, idx) => `
-      <div class="card">
-        <div class="model-container" id="model-${idx}"></div>
-        <div class="card-badge-row">
-          <span class="badge badge-stock">В наличии: ${item.stock}</span>
-          <span class="badge badge-buff">${item.buff}</span>
-        </div>
-        <h2>${item.title}</h2>
-        <div class="rates-box">
-          ${RENTAL_RATES.map(rate => `
-            <div class="rate-row">
-              <span class="rate-duration">${rate.period}</span>
-              <span class="rate-val">${rate.azp} / ${rate.cash}</span>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    `).join('');
+      box.addEventListener('mouseleave', () => {
+        isHovered = false;
+        card.style.transform = `rotateX(0deg) rotateY(0deg)`;
+        img.style.transform = `translateZ(45px) rotateY(0deg) scale(1)`;
+        glare.style.opacity = '0';
+      });
 
-    MARKET_ITEMS.forEach((item, idx) => {
-      initModel(`model-${idx}`, item.model);
+      // Сенсорное управление для смартфонов
+      box.addEventListener('touchmove', (e) => {
+        if (!e.touches[0]) return;
+        const rect = box.getBoundingClientRect();
+        const x = e.touches[0].clientX - rect.left;
+        const y = e.touches[0].clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateX = ((y - centerY) / centerY) * -18;
+        const rotateY = ((x - centerX) / centerX) * 18;
+
+        card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      });
+
+      box.addEventListener('touchend', () => {
+        card.style.transform = `rotateX(0deg) rotateY(0deg)`;
+      });
     });
   </script>
 </body>
