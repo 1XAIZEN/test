@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Market & Rental</title>
+  <title>Admin Market & Rental with 3D Preview</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -12,8 +12,11 @@
     :root {
       --bg-main: #0b0e14;
       --bg-card: #151a23;
+      --bg-model: #000;
       --accent-purple: #7c3aed;
       --accent-cyan: #06b6d4;
+      --accent-blue: #3b82f6;
+      --accent-ice: #e0f2fe;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --border-color: #262f3f;
@@ -34,24 +37,10 @@
       padding-bottom: 60px;
     }
 
-    .glow-bg {
-      position: fixed;
-      top: -150px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 600px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(124, 58, 237, 0.18) 0%, rgba(6, 182, 212, 0.08) 50%, transparent 80%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
     .container {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 0 20px;
-      position: relative;
-      z-index: 1;
     }
 
     header {
@@ -69,16 +58,10 @@
       letter-spacing: -0.5px;
     }
 
-    .title-block p {
-      color: var(--text-muted);
-      font-size: 14px;
-      margin-top: 4px;
-    }
-
     .market-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 30px;
     }
 
     .card {
@@ -88,21 +71,33 @@
       padding: 24px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+      overflow: hidden;
+      transition: transform 0.2s;
     }
 
     .card:hover {
       transform: translateY(-4px);
-      border-color: rgba(124, 58, 237, 0.4);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
     }
 
-    .card-badge-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .model-container {
+      width: 100%;
+      height: 300px;
+      background-color: var(--bg-model);
+      border-radius: 12px;
       margin-bottom: 16px;
+      position: relative;
+      cursor: grab;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .model-error {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ef4444;
+      font-size: 14px;
+      text-align: center;
     }
 
     .badge {
@@ -110,125 +105,128 @@
       border-radius: 6px;
       font-size: 12px;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
     .badge-stock {
       background: rgba(6, 182, 212, 0.15);
       color: var(--accent-cyan);
-      border: 1px solid rgba(6, 182, 212, 0.3);
     }
 
     .badge-buff {
       background: rgba(124, 58, 237, 0.15);
       color: #c084fc;
-      border: 1px solid rgba(124, 58, 237, 0.3);
-    }
-
-    .card h2 {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .card-desc {
-      font-size: 13.5px;
-      color: var(--text-muted);
-      margin-bottom: 20px;
-      min-height: 40px;
     }
 
     .rates-box {
+      margin-top: 16px;
       background: rgba(11, 14, 20, 0.6);
       border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 14px;
     }
 
-    .rates-box-title {
-      font-size: 11px;
-      font-weight: 700;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 10px;
-    }
-
     .rate-row {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding: 6px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
       font-size: 13px;
-    }
-
-    .rate-row:last-child {
-      border-bottom: none;
-    }
-
-    .rate-duration {
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    .rate-val {
-      font-weight: 700;
-      color: #38bdf8;
     }
   </style>
 </head>
 <body>
-
-  <div class="glow-bg"></div>
-
   <div class="container">
     <header>
       <div class="title-block">
-        <h1>Маркет аренды сетов & баффов</h1>
-        <p>Актуальные позиции, бонусы и расценки на аренду</p>
+        <h1>Админ-Маркет: Скины & Мечи</h1>
+        <p>3D-просмотр и актуальные цены</p>
       </div>
     </header>
-
     <div class="market-grid" id="market-container">
-      Загрузка актуальных цен...
+      Загрузка моделей и цен...
     </div>
   </div>
 
-  <script>
-    // Загружаем данные из файла data.json с защитой от кэширования браузера
-    fetch('./data.json?v=' + Date.now())
-      .then(res => res.json())
-      .then(items => {
-        const container = document.getElementById("market-container");
-        container.innerHTML = items.map(item => `
-          <div class="card">
-            <div>
-              <div class="card-badge-row">
-                <span class="badge badge-stock">${item.stock}</span>
-                <span class="badge badge-buff">${item.buff}</span>
-              </div>
-              <h2>${item.title}</h2>
-              <p class="card-desc">${item.desc}</p>
-            </div>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.157.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.157.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.157.0/examples/js/controls/OrbitControls.js"></script>
 
-            <div class="rates-box">
-              <div class="rates-box-title">Стоимость аренды</div>
-              ${item.rates.map(rate => `
-                <div class="rate-row">
-                  <span class="rate-duration">${rate.period}</span>
-                  <span class="rate-val">${rate.price}</span>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `).join('');
-      })
-      .catch(err => {
-        document.getElementById("market-container").innerHTML = 
-          '<p style="color:#ef4444;">Ошибка загрузки data.json. Убедитесь, что файл создан в репозитории.</p>';
+  <script>
+    const MARKET_ITEMS = [
+      { id: 1, title: "Админ Скин (Ж)", model: "female_admin", stock: "5 шт.", buff: "ADM Квесты +40%" },
+      { id: 2, title: "Админ Скин (М, Синий)", model: "male_admin_blue", stock: "3 шт.", buff: "x2 Зарплата" },
+      { id: 3, title: "Админ Скин (М, Чёрный)", model: "male_admin_black", stock: "2 шт.", buff: "x2 Зарплата" },
+      { id: 4, title: "Ледяная Скорбь", model: "frostmourne", stock: "1 шт.", buff: "Ледяной Урон +50" },
+    ];
+
+    const RENTAL_RATES = [
+      { period: "Сутки", azp: "15 АЗП", cash: "7.000.000$" },
+      { period: "7 суток", azp: "105 АЗП", cash: "49.000.000$" },
+      { period: "30 суток", azp: "450 АЗП", cash: "210.000.000$" },
+    ];
+
+    function initModel(containerId, modelFile) {
+      const container = document.getElementById(containerId);
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      container.appendChild(renderer.domElement);
+
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      const loader = new THREE.GLTFLoader();
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambientLight);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+      directionalLight.position.set(1, 1, 1);
+      scene.add(directionalLight);
+
+      loader.load(`./models/${modelFile}.glb`, (gltf) => {
+        const model = gltf.scene;
+        model.scale.set(1, 1, 1); 
+        model.position.y = -1; 
+        scene.add(model);
+        camera.position.z = 3;
+      }, undefined, (error) => {
+        container.innerHTML = '<p class="model-error">Модель не найдена.</p>';
       });
+
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener('resize', () => {
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+      });
+    }
+
+    const container = document.getElementById("market-container");
+    container.innerHTML = MARKET_ITEMS.map((item, idx) => `
+      <div class="card">
+        <div class="model-container" id="model-${idx}"></div>
+        <div class="card-badge-row">
+          <span class="badge badge-stock">В наличии: ${item.stock}</span>
+          <span class="badge badge-buff">${item.buff}</span>
+        </div>
+        <h2>${item.title}</h2>
+        <div class="rates-box">
+          ${RENTAL_RATES.map(rate => `
+            <div class="rate-row">
+              <span class="rate-duration">${rate.period}</span>
+              <span class="rate-val">${rate.azp} / ${rate.cash}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+
+    MARKET_ITEMS.forEach((item, idx) => {
+      initModel(`model-${idx}`, item.model);
+    });
   </script>
 </body>
 </html>
