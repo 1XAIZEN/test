@@ -3,28 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Arizona Market — Admin Inventory</title>
+  <title>Arizona Market — Admin Inventory Hub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --bg: #07080c;
-      --card-bg: #0f121a;
-      --border: rgba(255, 255, 255, 0.08);
-      --border-hover: rgba(255, 255, 255, 0.22);
-      
+      --bg: #07090e;
+      --card-bg: #0e121a;
+      --card-inner: #080a0f;
+      --border: rgba(255, 255, 255, 0.06);
+      --border-hover: rgba(255, 255, 255, 0.16);
       --text-white: #ffffff;
-      --text-gray: #828898;
       --text-silver: #cbd5e1;
-      
-      --accent-azp: #38bdf8;
-      --accent-cash: #22c55e;
-      --accent-glow: rgba(56, 189, 248, 0.15);
-      
-      --font-display: 'Space Grotesk', sans-serif;
-      --font-sans: 'Inter', sans-serif;
+      --text-muted: #64748b;
+      --accent-green: #10b981;
+      --accent-cyan: #38bdf8;
+      --accent-blue: #6366f1;
+      --font-main: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
     }
 
     * {
@@ -36,108 +34,133 @@
     body {
       background-color: var(--bg);
       color: var(--text-white);
-      font-family: var(--font-sans);
+      font-family: var(--font-main);
       min-height: 100vh;
-      padding: 40px 20px 100px;
+      padding: 48px 24px 100px;
       -webkit-font-smoothing: antialiased;
+      background-image: radial-gradient(ellipse 60% 40% at 50% -10%, rgba(99, 102, 241, 0.12), transparent);
     }
 
     .container {
-      max-width: 1180px;
+      max-width: 1200px;
       margin: 0 auto;
     }
 
     header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-end;
       gap: 20px;
       flex-wrap: wrap;
       margin-bottom: 40px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
     }
 
-    .logo-area {
+    .brand-box {
       display: flex;
-      align-items: center;
-      gap: 14px;
+      flex-direction: column;
+      gap: 6px;
     }
 
-    .logo-badge {
-      font-family: var(--font-display);
+    .brand-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      background: #192033;
-      color: #60a5fa;
-      padding: 5px 10px;
-      border-radius: 6px;
-      border: 1px solid rgba(96, 165, 250, 0.3);
+      color: var(--accent-cyan);
     }
 
-    .logo-title {
-      font-family: var(--font-display);
-      font-size: 26px;
+    .brand-tag::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--accent-cyan);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent-cyan);
+    }
+
+    .brand-title {
+      font-size: 30px;
       font-weight: 800;
       letter-spacing: -0.03em;
     }
 
-    .filter-group {
+    .filter-tabs {
       display: flex;
-      background: #0f121a;
+      background: var(--card-bg);
       border: 1px solid var(--border);
       padding: 4px;
       border-radius: 12px;
+      gap: 4px;
     }
 
-    .filter-btn {
-      background: none;
+    .tab-btn {
+      background: transparent;
       border: none;
-      color: var(--text-gray);
-      font-family: var(--font-sans);
+      color: var(--text-muted);
+      font-family: var(--font-main);
       font-size: 13px;
       font-weight: 600;
       padding: 8px 18px;
       border-radius: 8px;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .filter-btn:hover {
+    .tab-btn .count {
+      font-size: 11px;
+      opacity: 0.6;
+    }
+
+    .tab-btn:hover {
       color: var(--text-white);
     }
 
-    .filter-btn.active {
-      background: #1e2436;
+    .tab-btn.active {
+      background: #19202f;
       color: var(--text-white);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
 
     .catalog-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
       gap: 24px;
     }
 
-    .card {
+    @media (max-width: 400px) {
+      .catalog-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .item-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 18px;
+      border-radius: 20px;
       padding: 22px;
       display: flex;
       flex-direction: column;
       position: relative;
-      transition: border-color 0.2s ease, transform 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .card:hover {
+    .item-card:hover {
       border-color: var(--border-hover);
-      transform: translateY(-3px);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
     }
 
-    .card-visual {
-      height: 165px;
-      background: #090b10;
+    .preview-box {
+      height: 160px;
+      background: var(--card-inner);
       border-radius: 14px;
       display: flex;
       align-items: center;
@@ -145,177 +168,170 @@
       position: relative;
       overflow: hidden;
       margin-bottom: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.03);
     }
 
-    .visual-glow {
+    .preview-glow {
       position: absolute;
       width: 120px;
       height: 120px;
-      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, transparent 70%);
       border-radius: 50%;
       pointer-events: none;
     }
 
-    .card-visual img {
-      max-height: 115px;
-      max-width: 115px;
+    .preview-box img {
+      max-height: 110px;
+      max-width: 110px;
       object-fit: contain;
       position: relative;
       z-index: 1;
-      filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.8));
+      filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.8));
       transition: transform 0.25s ease;
     }
 
-    .card:hover .card-visual img {
+    .item-card:hover .preview-box img {
       transform: scale(1.08);
     }
 
-    /* Максимально контрастный бейдж наличия */
-    .stock-tag {
+    .id-tag {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    .stock-badge {
       position: absolute;
       top: 12px;
       right: 12px;
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 700;
-      color: #4ade80;
-      background: rgba(22, 101, 52, 0.35);
-      border: 1px solid rgba(74, 222, 128, 0.4);
       padding: 5px 10px;
       border-radius: 8px;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 6px;
       letter-spacing: 0.02em;
     }
 
-    .stock-tag::before {
+    .stock-badge.available {
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    .stock-badge.available::before {
       content: '';
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: #4ade80;
-      box-shadow: 0 0 8px #4ade80;
+      background: #34d399;
+      box-shadow: 0 0 8px #34d399;
     }
 
-    .item-id {
-      position: absolute;
-      top: 14px;
-      left: 14px;
-      font-family: var(--font-display);
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-gray);
-      letter-spacing: 0.05em;
+    .stock-badge.out-of-stock {
+      color: #f87171;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
     }
 
-    .card-header {
-      margin-bottom: 14px;
+    .item-info {
+      margin-bottom: 20px;
     }
 
-    .item-name {
-      font-family: var(--font-display);
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: -0.01em;
+    .item-title {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
       margin-bottom: 6px;
     }
 
-    .item-buff {
+    .item-desc {
       font-size: 13px;
       line-height: 1.45;
       color: var(--text-silver);
-      min-height: 38px;
     }
 
-    .item-buff strong {
+    .item-desc strong {
       color: #93c5fd;
       font-weight: 600;
     }
 
-    /* Селектор срока аренды */
-    .rental-selector {
+    .rental-block {
       margin-top: auto;
-      padding-top: 18px;
-      border-top: 1px solid var(--border);
     }
 
-    .period-label {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-gray);
-      margin-bottom: 8px;
-    }
-
-    .period-toggles {
+    .period-switches {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 6px;
-      background: #090b10;
+      background: var(--card-inner);
       padding: 4px;
       border-radius: 10px;
       margin-bottom: 14px;
       border: 1px solid rgba(255, 255, 255, 0.03);
     }
 
-    .toggle-btn {
-      background: none;
+    .switch-btn {
+      background: transparent;
       border: none;
-      color: var(--text-gray);
+      color: var(--text-muted);
+      font-family: var(--font-main);
       font-size: 12.5px;
       font-weight: 700;
       padding: 7px 0;
       border-radius: 7px;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: all 0.15s ease;
     }
 
-    .toggle-btn.active {
-      background: #1e2436;
+    .switch-btn.active {
+      background: #19202f;
       color: var(--text-white);
     }
 
-    /* Яркий, читаемый блок цен */
-    .prices-card {
-      background: #090b10;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+    .price-container {
+      background: var(--card-inner);
+      border: 1px solid rgba(255, 255, 255, 0.04);
       border-radius: 12px;
-      padding: 12px 14px;
+      padding: 12px 16px;
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
 
-    .price-row {
+    .price-line {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .price-name {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-gray);
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-    }
-
-    .val-azp {
-      font-family: var(--font-display);
-      font-size: 16px;
+    .price-lbl {
+      font-size: 11px;
       font-weight: 700;
-      color: var(--accent-azp);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
     .val-cash {
-      font-family: var(--font-display);
-      font-size: 18px;
+      font-family: var(--font-mono);
+      font-size: 17px;
       font-weight: 800;
-      color: var(--accent-cash);
-      letter-spacing: -0.01em;
-      text-shadow: 0 0 16px rgba(34, 197, 94, 0.25);
+      color: var(--accent-green);
+      letter-spacing: -0.02em;
+    }
+
+    .val-azp {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent-cyan);
     }
   </style>
 </head>
@@ -323,233 +339,114 @@
 
   <div class="container">
     <header>
-      <div class="logo-area">
-        <span class="logo-badge">Arizona Admin</span>
-        <h1 class="logo-title">Маркет Сетов</h1>
+      <div class="brand-box">
+        <span class="brand-tag">Arizona Roleplay • Market</span>
+        <h1 class="brand-title">Аренда Аксессуаров & Сетов</h1>
       </div>
 
-      <div class="filter-group">
-        <button class="filter-btn active" onclick="filterItems(event, 'all')">Все лоты</button>
-        <button class="filter-btn" onclick="filterItems(event, 'accessory')">Аксессуары</button>
-        <button class="filter-btn" onclick="filterItems(event, 'skin')">Скины</button>
+      <div class="filter-tabs" id="filter-container">
+        <button class="tab-btn active" onclick="setCategory('all', this)">Все <span class="count" id="count-all"></span></button>
+        <button class="tab-btn" onclick="setCategory('accessory', this)">Аксессуары <span class="count" id="count-accessory"></span></button>
+        <button class="tab-btn" onclick="setCategory('skin', this)">Скины <span class="count" id="count-skin"></span></button>
       </div>
     </header>
 
-    <div class="catalog-grid">
-      <!-- 1. Очки ADMIN -->
-      <div class="card" data-category="accessory" 
-           data-p1-azp="10 АЗП" data-p1-cash="5.000.000 $" 
-           data-p7-azp="70 АЗП" data-p7-cash="35.000.000 $" 
-           data-p30-azp="300 АЗП" data-p30-cash="150.000.000 $">
-        <div class="card-visual">
-          <span class="item-id">#5929</span>
-          <div class="visual-glow"></div>
-          <img src="./5929.png" alt="Очки ADMIN" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' fill=\'%23334155\' viewBox=\'0 0 16 16\'><path d=\'M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z\'/></svg>'"/>
-          <div class="stock-tag">В наличии: 6 шт.</div>
-        </div>
-
-        <div class="card-header">
-          <h2 class="item-name">Очки «ADMIN»</h2>
-          <p class="item-buff">Шанс <strong>15% получить x2 ЗП</strong> при ответе на входящий репорт.</p>
-        </div>
-
-        <div class="rental-selector">
-          <div class="period-label">Период аренды</div>
-          <div class="period-toggles">
-            <button class="toggle-btn active" onclick="selectPeriod(this, 'p1')">24 часа</button>
-            <button class="toggle-btn" onclick="selectPeriod(this, 'p7')">7 дней</button>
-            <button class="toggle-btn" onclick="selectPeriod(this, 'p30')">30 дней</button>
-          </div>
-
-          <div class="prices-card">
-            <div class="price-row">
-              <span class="price-name">В виртах ($)</span>
-              <span class="val-cash">5.000.000 $</span>
-            </div>
-            <div class="price-row">
-              <span class="price-name">В админ-ЗП</span>
-              <span class="val-azp">10 АЗП</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 2. Ледяная скорбь -->
-      <div class="card" data-category="accessory" 
-           data-p1-azp="10 АЗП" data-p1-cash="5.000.000 $" 
-           data-p7-azp="70 АЗП" data-p7-cash="35.000.000 $" 
-           data-p30-azp="300 АЗП" data-p30-cash="150.000.000 $">
-        <div class="card-visual">
-          <span class="item-id">#5888</span>
-          <div class="visual-glow"></div>
-          <img src="./5888.png" alt="Ледяная скорбь" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' fill=\'%23334155\' viewBox=\'0 0 16 16\'><path d=\'M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z\'/></svg>'"/>
-          <div class="stock-tag">В наличии: 6 шт.</div>
-        </div>
-
-        <div class="card-header">
-          <h2 class="item-name">Ледяная скорбь</h2>
-          <p class="item-buff">Шанс <strong>25% на x2 репутацию</strong> (активирует x4 при серверном x2).</p>
-        </div>
-
-        <div class="rental-selector">
-          <div class="period-label">Период аренды</div>
-          <div class="period-toggles">
-            <button class="toggle-btn active" onclick="selectPeriod(this, 'p1')">24 часа</button>
-            <button class="toggle-btn" onclick="selectPeriod(this, 'p7')">7 дней</button>
-            <button class="toggle-btn" onclick="selectPeriod(this, 'p30')">30 дней</button>
-          </div>
-
-          <div class="prices-card">
-            <div class="price-row">
-              <span class="price-name">В виртах ($)</span>
-              <span class="val-cash">5.000.000 $</span>
-            </div>
-            <div class="price-row">
-              <span class="price-name">В админ-ЗП</span>
-              <span class="val-azp">10 АЗП</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 3. Админ-2 [Ж] -->
-      <div class="card" data-category="skin" 
-           data-p1-azp="15 АЗП" data-p1-cash="7.000.000 $" 
-           data-p7-azp="105 АЗП" data-p7-cash="49.000.000 $" 
-           data-p30-azp="450 АЗП" data-p30-cash="210.000.000 $">
-        <div class="card-visual">
-          <span class="item-id">#6039</span>
-          <div class="visual-glow"></div>
-          <img src="./6039.png" alt="Админ-2 [Ж]" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' fill=\'%23334155\' viewBox=\'0 0 16 16\'><path d=\'M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z\'/></svg>'"/>
-          <div class="stock-tag">В наличии: 3 шт.</div>
-        </div>
-
-        <div class="card-header">
-          <h2 class="item-name">Админ-2 [Ж]</h2>
-          <p class="item-buff">Награды за ежедневные квесты <strong>увеличиваются на +40%</strong>.</p>
-        </div>
-
-        <div class="rental-selector">
-          <div class="period-label">Период аренды</div>
-          <div class="period-toggles">
-            <button class="toggle-btn active" onclick="selectPeriod(this, 'p1')">24 часа</button>
-            <button class="toggle-btn" onclick="selectPeriod(this, 'p7')">7 дней</button>
-            <button class="toggle-btn" onclick="selectPeriod(this, 'p30')">30 дней</button>
-          </div>
-
-          <div class="prices-card">
-            <div class="price-row">
-              <span class="price-name">В виртах ($)</span>
-              <span class="val-cash">7.000.000 $</span>
-            </div>
-            <div class="price-row">
-              <span class="price-name">В админ-ЗП</span>
-              <span class="val-azp">15 АЗП</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 4. Админ-2 [М] Синий -->
-      <div class="card" data-category="skin" 
-           data-p1-azp="15 АЗП" data-p1-cash="7.000.000 $" 
-           data-p7-azp="105 АЗП" data-p7-cash="49.000.000 $" 
-           data-p30-azp="450 АЗП" data-p30-cash="210.000.000 $">
-        <div class="card-visual">
-          <span class="item-id">#6041</span>
-          <div class="visual-glow"></div>
-          <img src="./6041.png" alt="Админ-2 [М]" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' fill=\'%23334155\' viewBox=\'0 0 16 16\'><path d=\'M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z\'/></svg>'"/>
-          <div class="stock-tag">В наличии: 1 шт.</div>
-        </div>
-
-        <div class="card-header">
-          <h2 class="item-name">Админ-2 [М]</h2>
-          <p class="item-buff">Награды за ежедневные квесты <strong>увеличиваются на +40%</strong>.</p>
-        </div>
-
-        <div class="rental-selector">
-          <div class="period-label">Период аренды</div>
-          <div class="period-toggles">
-            <button class="toggle-btn active" onclick="selectPeriod(this, 'p1')">24 часа</button>
-            <button class="toggle-btn" onclick="selectPeriod(this, 'p7')">7 дней</button>
-            <button class="toggle-btn" onclick="selectPeriod(this, 'p30')">30 дней</button>
-          </div>
-
-          <div class="prices-card">
-            <div class="price-row">
-              <span class="price-name">В виртах ($)</span>
-              <span class="val-cash">7.000.000 $</span>
-            </div>
-            <div class="price-row">
-              <span class="price-name">В админ-ЗП</span>
-              <span class="val-azp">15 АЗП</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 5. Админ-3 [М] Чёрный -->
-      <div class="card" data-category="skin" 
-           data-p1-azp="15 АЗП" data-p1-cash="7.000.000 $" 
-           data-p7-azp="105 АЗП" data-p7-cash="48.000.000 $" 
-           data-p30-azp="450 АЗП" data-p30-cash="210.000.000 $">
-        <div class="card-visual">
-          <span class="item-id">#6042</span>
-          <div class="visual-glow"></div>
-          <img src="./6042.png" alt="Админ-3 [М]" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' fill=\'%23334155\' viewBox=\'0 0 16 16\'><path d=\'M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z\'/></svg>'"/>
-          <div class="stock-tag">В наличии: 1 шт.</div>
-        </div>
-
-        <div class="card-header">
-          <h2 class="item-name">Админ-3 [М]</h2>
-          <p class="item-buff">Награды за ежедневные квесты <strong>увеличиваются на +40%</strong>.</p>
-        </div>
-
-        <div class="rental-selector">
-          <div class="period-label">Период аренды</div>
-          <div class="period-toggles">
-            <button class="toggle-btn active" onclick="selectPeriod(this, 'p1')">24 часа</button>
-            <button class="toggle-btn" onclick="selectPeriod(this, 'p7')">7 дней</button>
-            <button class="toggle-btn" onclick="selectPeriod(this, 'p30')">30 дней</button>
-          </div>
-
-          <div class="prices-card">
-            <div class="price-row">
-              <span class="price-name">В виртах ($)</span>
-              <span class="val-cash">7.000.000 $</span>
-            </div>
-            <div class="price-row">
-              <span class="price-name">В админ-ЗП</span>
-              <span class="val-azp">15 АЗП</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div class="catalog-grid" id="catalog-grid"></div>
   </div>
 
   <script>
-    function filterItems(event, category) {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      event.currentTarget.classList.add('active');
+    let itemsData = [];
+    let currentFilter = 'all';
 
-      document.querySelectorAll('.card').forEach(card => {
-        card.style.display = (category === 'all' || card.dataset.category === category) ? 'flex' : 'none';
+    async function loadData() {
+      try {
+        const response = await fetch('./items.json');
+        itemsData = await response.json();
+        renderCatalog();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderCatalog() {
+      const grid = document.getElementById('catalog-grid');
+      grid.innerHTML = '';
+
+      document.getElementById('count-all').textContent = `(${itemsData.length})`;
+      document.getElementById('count-accessory').textContent = `(${itemsData.filter(i => i.category === 'accessory').length})`;
+      document.getElementById('count-skin').textContent = `(${itemsData.filter(i => i.category === 'skin').length})`;
+
+      const filteredItems = currentFilter === 'all' 
+        ? itemsData 
+        : itemsData.filter(item => item.category === currentFilter);
+
+      filteredItems.forEach((item) => {
+        const isAvailable = item.stock > 0;
+        const stockHtml = isAvailable 
+          ? `<span class="stock-badge available">В наличии: ${item.stock} шт.</span>`
+          : `<span class="stock-badge out-of-stock">Нет в наличии</span>`;
+
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.id = `item-${item.id}`;
+        card.style.opacity = isAvailable ? '1' : '0.55';
+
+        card.innerHTML = `
+          <div class="preview-box">
+            <span class="id-tag">#${item.id}</span>
+            <div class="preview-glow"></div>
+            <img src="${item.image}" alt="${item.title}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'48\\' height=\\'48\\' fill=\\'%23334155\\' viewBox=\\'0 0 16 16\\'><path d=\\'M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z\\'/></svg>'"/>
+            ${stockHtml}
+          </div>
+
+          <div class="item-info">
+            <h2 class="item-title">${item.title}</h2>
+            <p class="item-desc">${item.description}</p>
+          </div>
+
+          <div class="rental-block">
+            <div class="period-switches">
+              <button class="switch-btn active" onclick="changePeriod('${item.id}', 'd1', this)" ${!isAvailable ? 'disabled' : ''}>24 часа</button>
+              <button class="switch-btn" onclick="changePeriod('${item.id}', 'd7', this)" ${!isAvailable ? 'disabled' : ''}>7 дней</button>
+              <button class="switch-btn" onclick="changePeriod('${item.id}', 'd30', this)" ${!isAvailable ? 'disabled' : ''}>30 дней</button>
+            </div>
+
+            <div class="price-container">
+              <div class="price-line">
+                <span class="price-lbl">В виртах ($)</span>
+                <span class="val-cash" id="cash-${item.id}">${item.rates.d1.cash}</span>
+              </div>
+              <div class="price-line">
+                <span class="price-lbl">В админ-ЗП</span>
+                <span class="val-azp" id="azp-${item.id}">${item.rates.d1.azp}</span>
+              </div>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
       });
     }
 
-    function selectPeriod(btn, periodKey) {
-      const card = btn.closest('.card');
-      
-      card.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    function changePeriod(itemId, periodKey, btn) {
+      const item = itemsData.find(i => i.id === itemId);
+      if (!item) return;
+
+      const card = btn.closest('.item-card');
+      card.querySelectorAll('.switch-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
-      const azp = card.dataset[`${periodKey}Azp`];
-      const cash = card.dataset[`${periodKey}Cash`];
-
-      card.querySelector('.val-cash').textContent = cash;
-      card.querySelector('.val-azp').textContent = azp;
+      document.getElementById(`cash-${itemId}`).textContent = item.rates[periodKey].cash;
+      document.getElementById(`azp-${itemId}`).textContent = item.rates[periodKey].azp;
     }
+
+    function setCategory(category, btn) {
+      currentFilter = category;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderCatalog();
+    }
+
+    document.addEventListener('DOMContentLoaded', loadData);
   </script>
 </body>
 </html>
