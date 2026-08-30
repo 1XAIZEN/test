@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Market & Rental</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-main: #0b0e14;
+      --bg-card: #151a23;
+      --accent-purple: #7c3aed;
+      --accent-cyan: #06b6d4;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #262f3f;
+      --card-radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding-bottom: 60px;
+    }
+
+    .glow-bg {
+      position: fixed;
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(124, 58, 237, 0.18) 0%, rgba(6, 182, 212, 0.08) 50%, transparent 80%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      padding: 40px 0 30px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 40px;
+    }
+
+    .title-block h1 {
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff 30%, var(--accent-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .title-block p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .market-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--card-radius);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(124, 58, 237, 0.4);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .card-badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-stock {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    .badge-buff {
+      background: rgba(124, 58, 237, 0.15);
+      color: #c084fc;
+      border: 1px solid rgba(124, 58, 237, 0.3);
+    }
+
+    .card h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .card-desc {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      min-height: 40px;
+    }
+
+    .rates-box {
+      background: rgba(11, 14, 20, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .rates-box-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .rate-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 13px;
+    }
+
+    .rate-row:last-child {
+      border-bottom: none;
+    }
+
+    .rate-duration {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .rate-val {
+      font-weight: 700;
+      color: #38bdf8;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glow-bg"></div>
+
+  <div class="container">
+    <header>
+      <div class="title-block">
+        <h1>Маркет аренды сетов & баффов</h1>
+        <p>Актуальные позиции, бонусы и расценки на аренду</p>
+      </div>
+    </header>
+
+    <div class="market-grid" id="market-container">
+      Загрузка актуальных цен...
+    </div>
+  </div>
+
+  <script>
+    // Загружаем данные из файла data.json с защитой от кэширования браузера
+    fetch('./data.json?v=' + Date.now())
+      .then(res => res.json())
+      .then(items => {
+        const container = document.getElementById("market-container");
+        container.innerHTML = items.map(item => `
+          <div class="card">
+            <div>
+              <div class="card-badge-row">
+                <span class="badge badge-stock">${item.stock}</span>
+                <span class="badge badge-buff">${item.buff}</span>
+              </div>
+              <h2>${item.title}</h2>
+              <p class="card-desc">${item.desc}</p>
+            </div>
+
+            <div class="rates-box">
+              <div class="rates-box-title">Стоимость аренды</div>
+              ${item.rates.map(rate => `
+                <div class="rate-row">
+                  <span class="rate-duration">${rate.period}</span>
+                  <span class="rate-val">${rate.price}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `).join('');
+      })
+      .catch(err => {
+        document.getElementById("market-container").innerHTML = 
+          '<p style="color:#ef4444;">Ошибка загрузки data.json. Убедитесь, что файл создан в репозитории.</p>';
+      });
+  </script>
+</body>
+</html>
