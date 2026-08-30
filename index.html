@@ -1,128 +1,490 @@
-let rawItems = [];
-let activeFilter = 'all';
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mikki_Tyler | Лавка</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-async function init() {
-  try {
-    const res = await fetch(`./items.json?t=${Date.now()}`, { cache: 'no-store' });
-    rawItems = await res.json();
-    updateCounters();
-    render();
-  } catch (e) {
-    console.error(e);
-  }
-}
+  <style>
+    :root {
+      --bg: #000000;
+      --surface: #0a0a0a;
+      --surface-subtle: #111111;
+      --line: #1f1f1f;
+      --line-hover: #333333;
+      
+      --text: #ededed;
+      --text-dim: #888888;
+      --text-muted: #555555;
+      
+      --accent: #ffffff;
+      --green: #22c55e;
+      --blue: #60a5fa;
 
-function pluralize(n, forms) {
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  if (mod100 >= 11 && mod100 <= 19) return `${n} ${forms[2]}`;
-  if (mod10 === 1) return `${n} ${forms[0]}`;
-  if (mod10 >= 2 && mod10 <= 4) return `${n} ${forms[1]}`;
-  return `${n} ${forms[2]}`;
-}
+      --font: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+      --mono: 'Geist Mono', monospace;
+    }
 
-function calcTimeRemaining(dateStr, stock) {
-  if (!dateStr) {
-    return stock > 0 ? `${stock} шт.` : 'Свободен';
-  }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  const diff = new Date(dateStr) - new Date();
-  if (diff <= 0) return 'Истёк';
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      padding: 64px 24px 120px;
+      -webkit-font-smoothing: antialiased;
+      letter-spacing: -0.01em;
+    }
 
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const minutes = Math.floor((diff / 1000 / 60) % 60);
+    .wrapper {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
 
-  if (days > 0) return pluralize(days, ['день', 'дня', 'дней']);
-  if (hours > 0) return pluralize(hours, ['час', 'часа', 'часов']);
-  return pluralize(minutes, ['минута', 'минуты', 'минут']);
-}
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
 
-function updateCounters() {
-  document.getElementById('c-all').textContent = rawItems.length;
-  document.getElementById('c-acc').textContent = rawItems.filter(i => i.category === 'accessory').length;
-  document.getElementById('c-skn').textContent = rawItems.filter(i => i.category === 'skin').length;
-}
+    .brand-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
 
-function render() {
-  const container = document.getElementById('grid');
-  container.innerHTML = '';
+    .system-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
 
-  const items = activeFilter === 'all' 
-    ? rawItems 
-    : rawItems.filter(i => i.category === activeFilter);
+    .brand-title {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
 
-  items.forEach(item => {
-    const timeStatus = calcTimeRemaining(item.rentUntil, item.stock);
-    const isRented = item.rentUntil && new Date(item.rentUntil) > new Date();
-    const iconType = item.category === 'skin' ? '👕' : '⏱️';
-    const bottomBuff = item.buff || (item.category === 'skin' ? '+12' : 'P:1 d');
+    .nav-tabs {
+      display: flex;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 9999px;
+      padding: 3px;
+      gap: 2px;
+    }
 
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.id = `card-${item.id}`;
+    .tab {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: color 0.15s ease, background 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-    card.innerHTML = `
-      <div class="slot-header">
-        <div class="badge" style="${isRented ? 'color: #fbbf24; border-color: rgba(251,191,36,0.2);' : ''}">${timeStatus}</div>
-        <div class="badge badge-icon">${iconType}</div>
+    .tab .count {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .tab:hover {
+      color: var(--text);
+    }
+
+    .tab.active {
+      background: var(--surface-subtle);
+      color: var(--text);
+    }
+
+    .tab.active .count {
+      color: var(--text-dim);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px;
+    }
+
+    @media (max-width: 480px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      background: #0d0d0e;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: var(--line-hover);
+      transform: translateY(-2px);
+    }
+
+    /* Золотистое свечение в углу как на скриншоте инвентаря */
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 0% 100%, rgba(212, 160, 23, 0.35) 0%, rgba(138, 97, 10, 0.12) 40%, transparent 65%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .item-id {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Бейджи таймера и категории */
+    .badge-group {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .badge-status {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 3px 8px;
+      border-radius: 9999px;
+      color: #dedede;
+    }
+
+    .badge-status.rented {
+      color: #fbbf24;
+      border-color: rgba(251, 191, 36, 0.25);
+    }
+
+    .badge-type {
+      font-size: 12px;
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 2px 6px;
+      border-radius: 9999px;
+      line-height: 1;
+    }
+
+    .image-stage {
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .image-stage img {
+      max-height: 110px;
+      max-width: 110px;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.9));
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover .image-stage img {
+      transform: scale(1.05);
+    }
+
+    .card-content {
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .item-name {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .item-desc {
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: var(--text-dim);
+      min-height: 38px;
+    }
+
+    .item-bottom {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      z-index: 2;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+    }
+
+    .period-list {
+      display: flex;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 2px;
+      background: var(--surface);
+    }
+
+    .period-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 5px 0;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .period-btn:hover {
+      color: var(--text);
+    }
+
+    .period-btn.active {
+      background: var(--surface-subtle);
+      color: var(--text);
+    }
+
+    .pricing-table {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-top: 4px;
+    }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .price-name {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-family: var(--mono);
+      letter-spacing: 0.05em;
+    }
+
+    .price-val-cash {
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .price-val-azp {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+    <header>
+      <div class="brand-group">
+        <span class="system-label">Mikki Tyler | Лавка</span>
+        <h1 class="brand-title">Аренда аксессуаров и скинов</h1>
       </div>
 
-      <div class="image-stage">
-        <img src="${item.image}" alt="${item.title}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'32\\' height=\\'32\\' fill=\\'%23555\\' viewBox=\\'0 0 16 16\\'><path d=\\'M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z\\'/></svg>'"/>
+      <div class="nav-tabs">
+        <button class="tab active" onclick="setFilter('all', this)">Все <span class="count" id="c-all"></span></button>
+        <button class="tab" onclick="setFilter('accessory', this)">Аксессуары <span class="count" id="c-acc"></span></button>
+        <button class="tab" onclick="setFilter('skin', this)">Скины <span class="count" id="c-skn"></span></button>
       </div>
+    </header>
 
-      <div class="slot-footer">
-        <span class="badge badge-buff">${bottomBuff}</span>
-        <span style="font-size: 10px; color: var(--text-muted); font-family: var(--mono);">#${item.id}</span>
-      </div>
+    <div class="grid" id="grid"></div>
+  </div>
 
-      <div class="card-content">
-        <h2 class="item-name">${item.title}</h2>
-        <p class="item-desc">${item.description || 'Описание отсутствует'}</p>
-      </div>
+  <script>
+    let rawItems = [];
+    let activeFilter = 'all';
 
-      <div class="item-bottom">
-        <div class="period-list">
-          <button class="period-btn active" onclick="setPeriod('${item.id}', 'd1', this)">1Д</button>
-          <button class="period-btn" onclick="setPeriod('${item.id}', 'd7', this)">7Д</button>
-          <button class="period-btn" onclick="setPeriod('${item.id}', 'd30', this)">30Д</button>
-        </div>
+    async function init() {
+      try {
+        const res = await fetch(`./items.json?t=${Date.now()}`, { cache: 'no-store' });
+        rawItems = await res.json();
+        updateCounters();
+        render();
+      } catch (e) {
+        console.error(e);
+      }
+    }
 
-        <div class="pricing-table">
-          <div class="price-col">
-            <span class="price-label">Вирты</span>
-            <span class="price-val-cash" id="cash-${item.id}">${item.rates?.d1?.cash || '—'}</span>
+    // Склонение числительных (1 день, 2 дня, 5 дней)
+    function pluralize(n, forms) {
+      const mod10 = n % 10;
+      const mod100 = n % 100;
+      if (mod100 >= 11 && mod100 <= 19) return `${n} ${forms[2]}`;
+      if (mod10 === 1) return `${n} ${forms[0]}`;
+      if (mod10 >= 2 && mod10 <= 4) return `${n} ${forms[1]}`;
+      return `${n} ${forms[2]}`;
+    }
+
+    // Автоматический расчёт остатка срока
+    function formatTimeRemaining(rentUntil, stock) {
+      if (!rentUntil) {
+        return {
+          text: stock > 0 ? `${stock} шт.` : 'Нет в наличии',
+          isRented: false
+        };
+      }
+
+      const diff = new Date(rentUntil) - new Date();
+      if (diff <= 0) {
+        return { text: 'Срок истёк', isRented: false };
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+
+      let text = '';
+      if (days > 0) text = pluralize(days, ['день', 'дня', 'дней']);
+      else if (hours > 0) text = pluralize(hours, ['час', 'часа', 'часов']);
+      else text = pluralize(minutes, ['минута', 'минуты', 'минут']);
+
+      return { text, isRented: true };
+    }
+
+    function updateCounters() {
+      document.getElementById('c-all').textContent = rawItems.length;
+      document.getElementById('c-acc').textContent = rawItems.filter(i => i.category === 'accessory').length;
+      document.getElementById('c-skn').textContent = rawItems.filter(i => i.category === 'skin').length;
+    }
+
+    function render() {
+      const container = document.getElementById('grid');
+      container.innerHTML = '';
+
+      const items = activeFilter === 'all' 
+        ? rawItems 
+        : rawItems.filter(i => i.category === activeFilter);
+
+      items.forEach(item => {
+        const timeInfo = formatTimeRemaining(item.rentUntil, item.stock);
+        const typeIcon = item.category === 'skin' ? '👕' : '⏱️';
+
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.id = `card-${item.id}`;
+
+        card.innerHTML = `
+          <div class="card-meta">
+            <span class="item-id">#${item.id}</span>
+            <div class="badge-group">
+              <span class="badge-status ${timeInfo.isRented ? 'rented' : ''}">${timeInfo.text}</span>
+              <span class="badge-type">${typeIcon}</span>
+            </div>
           </div>
-          <div class="price-col" style="text-align: right;">
-            <span class="price-label">АЗП</span>
-            <span class="price-val-azp" id="azp-${item.id}">${item.rates?.d1?.azp || '—'}</span>
+
+          <div class="image-stage">
+            <img src="${item.image}" alt="${item.title}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'32\\' height=\\'32\\' fill=\\'%23333\\' viewBox=\\'0 0 16 16\\'><path d=\\'M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z\\'/></svg>'"/>
           </div>
-        </div>
-      </div>
-    `;
 
-    container.appendChild(card);
-  });
-}
+          <div class="card-content">
+            <h2 class="item-name">${item.title}</h2>
+            <p class="item-desc">${item.description || ''}</p>
+          </div>
 
-function setPeriod(id, period, el) {
-  const item = rawItems.find(i => i.id === id);
-  if (!item || !item.rates) return;
+          <div class="item-bottom">
+            <div class="period-list">
+              <button class="period-btn active" onclick="setPeriod('${item.id}', 'd1', this)">24H</button>
+              <button class="period-btn" onclick="setPeriod('${item.id}', 'd7', this)">7D</button>
+              <button class="period-btn" onclick="setPeriod('${item.id}', 'd30', this)">30D</button>
+            </div>
 
-  const card = el.closest('.card');
-  card.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
+            <div class="pricing-table">
+              <div class="price-row">
+                <span class="price-name">Вирты</span>
+                <span class="price-val-cash" id="cash-${item.id}">${item.rates?.d1?.cash || '—'}</span>
+              </div>
+              <div class="price-row">
+                <span class="price-name">АЗП</span>
+                <span class="price-val-azp" id="azp-${item.id}">${item.rates?.d1?.azp || '—'}</span>
+              </div>
+            </div>
+          </div>
+        `;
 
-  document.getElementById(`cash-${id}`).textContent = item.rates[period]?.cash || '—';
-  document.getElementById(`azp-${id}`).textContent = item.rates[period]?.azp || '—';
-}
+        container.appendChild(card);
+      });
+    }
 
-function setFilter(cat, el) {
-  activeFilter = cat;
-  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  render();
-}
+    function setPeriod(id, period, el) {
+      const item = rawItems.find(i => i.id === id);
+      if (!item || !item.rates) return;
 
-document.addEventListener('DOMContentLoaded', init);
+      const card = el.closest('.card');
+      card.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+
+      document.getElementById(`cash-${id}`).textContent = item.rates[period]?.cash || '—';
+      document.getElementById(`azp-${id}`).textContent = item.rates[period]?.azp || '—';
+    }
+
+    function setFilter(cat, el) {
+      activeFilter = cat;
+      document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      render();
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
