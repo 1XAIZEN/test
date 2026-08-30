@@ -327,7 +327,7 @@
 
     async function init() {
       try {
-        const res = await fetch('./items.json');
+        const res = await fetch(`./items.json?t=${Date.now()}`, { cache: 'no-store' });
         rawItems = await res.json();
         updateCounters();
         render();
