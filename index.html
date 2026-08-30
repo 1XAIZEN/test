@@ -3,32 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Маркет Аренды & Сетов — Arizona RP</title>
+  <title>Arizona Market — Admin Inventory</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      --bg-base: #07090e;
-      --bg-surface: rgba(17, 24, 39, 0.7);
-      --bg-surface-elevated: rgba(26, 36, 56, 0.6);
-      --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-focus: rgba(99, 102, 241, 0.5);
-
-      --primary: #6366f1;
-      --accent-cyan: #06b6d4;
-      --accent-emerald: #10b981;
-      --accent-purple: #a855f7;
-      --accent-amber: #f59e0b;
-
-      --text-head: #ffffff;
-      --text-main: #cbd5e1;
-      --text-muted: #64748b;
+      --bg: #090a0f;
+      --card-bg: #11131a;
+      --border: rgba(255, 255, 255, 0.07);
+      --border-hover: rgba(255, 255, 255, 0.18);
       
-      --glow-blue: rgba(56, 189, 248, 0.15);
-      --radius-xl: 20px;
-      --radius-md: 10px;
+      --text-white: #ffffff;
+      --text-gray: #717686;
+      --text-silver: #9ca3af;
+      
+      --accent: #3b82f6;
+      --accent-glow: rgba(59, 130, 246, 0.15);
+      
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-sans: 'Inter', sans-serif;
     }
 
     * {
@@ -38,339 +33,286 @@
     }
 
     body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: var(--bg-base);
-      color: var(--text-main);
+      background-color: var(--bg);
+      color: var(--text-white);
+      font-family: var(--font-sans);
       min-height: 100vh;
-      overflow-x: hidden;
-      position: relative;
-      padding-bottom: 90px;
+      padding: 40px 20px 100px;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Фоновые градиентные сферы */
-    body::before, body::after {
-      content: '';
-      position: fixed;
-      width: 500px;
-      height: 500px;
-      border-radius: 50%;
-      filter: blur(140px);
-      z-index: -1;
-      opacity: 0.45;
-      pointer-events: none;
-    }
-    body::before {
-      background: radial-gradient(circle, #4f46e5 0%, transparent 70%);
-      top: -150px;
-      left: 10%;
-    }
-    body::after {
-      background: radial-gradient(circle, #06b6d4 0%, transparent 70%);
-      bottom: 5%;
-      right: 5%;
-    }
-
     .container {
-      max-width: 1260px;
+      max-width: 1180px;
       margin: 0 auto;
-      padding: 0 24px;
     }
 
-    /* Навбар / Шапка */
+    /* Навигация и фильтры */
     header {
-      padding: 50px 0 30px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 20px;
       flex-wrap: wrap;
-      gap: 24px;
-      border-bottom: 1px solid var(--border-subtle);
-      margin-bottom: 40px;
+      margin-bottom: 48px;
     }
 
-    .brand-title {
-      font-size: 32px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: var(--text-head);
+    .logo-area {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
-    .brand-title span {
-      background: linear-gradient(135deg, #60a5fa 0%, #a855f7 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .logo-badge {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: #1e2230;
+      color: #93c5fd;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(147, 197, 253, 0.2);
     }
 
-    .brand-subtitle {
-      color: var(--text-muted);
-      font-size: 14px;
-      font-weight: 500;
-      margin-top: 4px;
+    .logo-title {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
     }
 
-    /* Переключатель табов */
-    .filter-tabs {
-      display: inline-flex;
-      background: rgba(15, 23, 42, 0.8);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--border-subtle);
-      border-radius: 14px;
-      padding: 4px;
-      gap: 4px;
-    }
-
-    .tab-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-family: inherit;
-      font-weight: 600;
-      font-size: 13.5px;
-      padding: 9px 18px;
+    .filter-group {
+      display: flex;
+      background: #11131a;
+      border: 1px solid var(--border);
+      padding: 3px;
       border-radius: 10px;
+    }
+
+    .filter-btn {
+      background: none;
+      border: none;
+      color: var(--text-gray);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 7px;
       cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.15s ease;
     }
 
-    .tab-btn:hover {
-      color: var(--text-head);
+    .filter-btn:hover {
+      color: var(--text-white);
     }
 
-    .tab-btn.active {
-      background: var(--primary);
-      color: #fff;
-      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    .filter-btn.active {
+      background: #1a1d27;
+      color: var(--text-white);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
     }
 
-    /* Сетка каталога */
-    .market-grid {
+    /* Грид карточек */
+    .catalog-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 20px;
     }
 
-    @media (max-width: 440px) {
-      .market-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* Премиальная карточка товара */
+    /* Карточка товара */
     .card {
-      background: var(--bg-surface);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-xl);
-      padding: 24px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
       position: relative;
-      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      padding: 1px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      pointer-events: none;
+      transition: border-color 0.2s ease, transform 0.2s ease;
     }
 
     .card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(99, 102, 241, 0.4);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(99, 102, 241, 0.1);
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
     }
 
-    .card-head {
-      display: flex;
-      gap: 18px;
-      margin-bottom: 20px;
-    }
-
-    .icon-frame {
-      width: 88px;
-      height: 88px;
-      min-width: 88px;
-      background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
+    /* Визуальная секция итема */
+    .card-visual {
+      height: 160px;
+      background: #0d0f14;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
-      box-shadow: inset 0 2px 4px rgba(255,255,255,0.05);
+      overflow: hidden;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
     }
 
-    .icon-frame img {
-      max-width: 70px;
-      max-height: 70px;
+    .visual-glow {
+      position: absolute;
+      width: 110px;
+      height: 110px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .card-visual img {
+      max-height: 110px;
+      max-width: 110px;
       object-fit: contain;
-      filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.5));
-      transition: transform 0.3s ease;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.7));
+      transition: transform 0.2s ease;
     }
 
-    .card:hover .icon-frame img {
-      transform: scale(1.1);
+    .card:hover .card-visual img {
+      transform: scale(1.06);
     }
 
-    .card-info {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .badges {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin-bottom: 8px;
-    }
-
-    .badge {
+    .stock-tag {
+      position: absolute;
+      top: 12px;
+      right: 12px;
       font-size: 11px;
-      font-weight: 700;
-      padding: 4px 8px;
-      border-radius: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-
-    .badge-stock {
-      background: rgba(16, 185, 129, 0.12);
+      font-weight: 600;
       color: #34d399;
+      background: rgba(16, 185, 129, 0.1);
       border: 1px solid rgba(16, 185, 129, 0.2);
-      display: inline-flex;
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: flex;
       align-items: center;
       gap: 5px;
     }
 
-    .badge-stock::before {
+    .stock-tag::before {
       content: '';
-      width: 5px;
-      height: 5px;
-      background: #34d399;
+      width: 4px;
+      height: 4px;
       border-radius: 50%;
-      box-shadow: 0 0 6px #34d399;
+      background: #34d399;
     }
 
-    .badge-buff-amber {
-      background: rgba(245, 158, 11, 0.12);
-      color: #fbbf24;
-      border: 1px solid rgba(245, 158, 11, 0.25);
+    .item-id {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      font-family: var(--font-display);
+      font-size: 11px;
+      color: var(--text-gray);
+      letter-spacing: 0.05em;
     }
 
-    .badge-buff-blue {
-      background: rgba(56, 189, 248, 0.12);
-      color: #38bdf8;
-      border: 1px solid rgba(56, 189, 248, 0.25);
+    /* Инфо о предмете */
+    .card-header {
+      margin-bottom: 12px;
     }
 
-    .badge-buff-purple {
-      background: rgba(168, 85, 247, 0.12);
-      color: #c084fc;
-      border: 1px solid rgba(168, 85, 247, 0.25);
-    }
-
-    .card-title {
+    .item-name {
+      font-family: var(--font-display);
       font-size: 19px;
       font-weight: 700;
-      color: var(--text-head);
-      line-height: 1.25;
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
     }
 
-    .card-subtext {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 4px;
-      font-weight: 500;
+    .item-buff {
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--text-silver);
+      min-height: 36px;
     }
 
-    /* Блок описания и пассивки */
-    .game-desc-box {
-      background: var(--bg-surface-elevated);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 12px 14px;
-      margin-bottom: 20px;
-      font-size: 12.5px;
-      line-height: 1.45;
-      color: #94a3b8;
-    }
-
-    .desc-buff-highlight {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      margin-top: 8px;
-      padding-top: 8px;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
-      color: #f1f5f9;
+    .item-buff strong {
+      color: #93c5fd;
       font-weight: 600;
     }
 
-    /* Таблица расценок */
-    .rates-box {
-      background: rgba(11, 15, 25, 0.6);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 12px 16px;
+    /* Селектор срока аренды */
+    .rental-selector {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
     }
 
-    .rates-header {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border-subtle);
-      margin-bottom: 8px;
+    .period-toggles {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      background: #0d0f14;
+      padding: 4px;
+      border-radius: 8px;
+      margin-bottom: 16px;
     }
 
-    .rate-row {
+    .toggle-btn {
+      background: none;
+      border: none;
+      color: var(--text-gray);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 0;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .toggle-btn.active {
+      background: #1e2230;
+      color: var(--text-white);
+    }
+
+    /* Блок цен и кнопка */
+    .price-action-row {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 8px 0;
-      font-size: 13px;
+      justify-content: space-between;
+      gap: 12px;
     }
 
-    .rate-row:not(:last-child) {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    .price-data {
+      display: flex;
+      flex-direction: column;
     }
 
-    .rate-period {
-      color: var(--text-muted);
+    .price-primary {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-white);
+    }
+
+    .price-secondary {
+      font-size: 11px;
+      color: var(--text-gray);
       font-weight: 500;
     }
 
-    .rate-price {
+    .rent-btn {
+      background: var(--text-white);
+      color: #000;
+      border: none;
+      font-family: var(--font-sans);
+      font-size: 13px;
       font-weight: 700;
-      color: var(--text-head);
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.1s ease;
     }
 
-    .rate-price .azp {
-      color: #38bdf8;
-      font-weight: 800;
+    .rent-btn:hover {
+      background: #e2e8f0;
     }
 
-    .rate-price .cash {
-      color: #34d399;
-      margin-left: 2px;
+    .rent-btn:active {
+      transform: scale(0.97);
     }
   </style>
 </head>
@@ -378,245 +320,170 @@
 
   <div class="container">
     <header>
-      <div class="brand">
-        <h1 class="brand-title">Arizona <span>Admin Hub</span></h1>
-        <p class="brand-subtitle">Централизованный маркет аренды модификаторов и сетов</p>
+      <div class="logo-area">
+        <span class="logo-badge">Arizona Admin</span>
+        <h1 class="logo-title">Маркет Сетов</h1>
       </div>
 
-      <div class="filter-tabs">
-        <button class="tab-btn active" onclick="filterItems(event, 'all')">Все (5)</button>
-        <button class="tab-btn" onclick="filterItems(event, 'accessory')">Аксессуары (2)</button>
-        <button class="tab-btn" onclick="filterItems(event, 'skin')">Скины (3)</button>
+      <div class="filter-group">
+        <button class="filter-btn active" onclick="filterItems(event, 'all')">Все лоты</button>
+        <button class="filter-btn" onclick="filterItems(event, 'accessory')">Аксессуары</button>
+        <button class="filter-btn" onclick="filterItems(event, 'skin')">Скины</button>
       </div>
     </header>
 
-    <div class="market-grid" id="market-grid">
-      <!-- Карточка 1 -->
-      <div class="card" data-category="accessory">
-        <div>
-          <div class="card-head">
-            <div class="icon-frame">
-              <img src="./5929.png" alt="Очки ADMIN" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' fill=\'%2364748b\' viewBox=\'0 0 16 16\'><path d=\'M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z\'/></svg>'"/>
-            </div>
-            <div class="card-info">
-              <div class="badges">
-                <span class="badge badge-stock">6 шт.</span>
-                <span class="badge badge-buff-amber">x2 Зарплата</span>
-              </div>
-              <h2 class="card-title">Очки «ADMIN»</h2>
-              <div class="card-subtext">Аксессуар • ID 5929</div>
-            </div>
-          </div>
-
-          <div class="game-desc-box">
-            Доступно в ADMIN SHOP или на Центральном Рынке.
-            <div class="desc-buff-highlight">
-              <span>⚡</span>
-              <span>Шанс 15% получить x2 админ-зарплату при ответе на репорт.</span>
-            </div>
-          </div>
+    <div class="catalog-grid">
+      <!-- 1. Очки ADMIN -->
+      <div class="card" data-category="accessory" data-p1-azp="10" data-p1-cash="5.000.000$" data-p7-azp="70" data-p7-cash="35.000.000$" data-p30-azp="300" data-p30-cash="150.000.000$">
+        <div class="card-visual">
+          <span class="item-id">#5929</span>
+          <div class="visual-glow"></div>
+          <img src="./5929.png" alt="Очки ADMIN" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' fill=\'%23334155\' viewBox=\'0 0 16 16\'><path d=\'M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z\'/></svg>'"/>
+          <div class="stock-tag">6 шт.</div>
         </div>
 
-        <div class="rates-box">
-          <div class="rates-header">
-            <span>Период</span>
-            <span>Тариф</span>
+        <div class="card-header">
+          <h2 class="item-name">Очки «ADMIN»</h2>
+          <p class="item-buff">Шанс <strong>15% получить x2 ЗП</strong> при ответе на входящий репорт.</p>
+        </div>
+
+        <div class="rental-selector">
+          <div class="period-toggles">
+            <button class="toggle-btn active" onclick="selectPeriod(this, 'p1')">24ч</button>
+            <button class="toggle-btn" onclick="selectPeriod(this, 'p7')">7 дней</button>
+            <button class="toggle-btn" onclick="selectPeriod(this, 'p30')">30 дней</button>
           </div>
-          <div class="rate-row">
-            <span class="rate-period">24 часа</span>
-            <span class="rate-price"><span class="azp">10 АЗП</span> / <span class="cash">5.000.000$</span></span>
-          </div>
-          <div class="rate-row">
-            <span class="rate-period">7 дней</span>
-            <span class="rate-price"><span class="azp">70 АЗП</span> / <span class="cash">35.000.000$</span></span>
-          </div>
-          <div class="rate-row">
-            <span class="rate-period">30 дней</span>
-            <span class="rate-price"><span class="azp">300 АЗП</span> / <span class="cash">150.000.000$</span></span>
+
+          <div class="price-action-row">
+            <div class="price-data">
+              <span class="price-primary">10 АЗП</span>
+              <span class="price-secondary">или 5.000.000$</span>
+            </div>
+            <button class="rent-btn">Аренда</button>
           </div>
         </div>
       </div>
 
-      <!-- Карточка 2 -->
-      <div class="card" data-category="accessory">
-        <div>
-          <div class="card-head">
-            <div class="icon-frame">
-              <img src="./5888.png" alt="Ледяная скорбь" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' fill=\'%2364748b\' viewBox=\'0 0 16 16\'><path d=\'M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z\'/></svg>'"/>
-            </div>
-            <div class="card-info">
-              <div class="badges">
-                <span class="badge badge-stock">6 шт.</span>
-                <span class="badge badge-buff-blue">x2 Репутация</span>
-              </div>
-              <h2 class="card-title">Ледяная скорбь</h2>
-              <div class="card-subtext">Аксессуар • ID 5888</div>
-            </div>
-          </div>
-
-          <div class="game-desc-box">
-            Легендарный артефакт для активного фарма репорта.
-            <div class="desc-buff-highlight">
-              <span>❄️</span>
-              <span>25% шанс на x2 репутацию (при серверном x2 активируется x4).</span>
-            </div>
-          </div>
+      <!-- 2. Ледяная скорбь -->
+      <div class="card" data-category="accessory" data-p1-azp="10" data-p1-cash="5.000.000$" data-p7-azp="70" data-p7-cash="35.000.000$" data-p30-azp="300" data-p30-cash="150.000.000$">
+        <div class="card-visual">
+          <span class="item-id">#5888</span>
+          <div class="visual-glow"></div>
+          <img src="./5888.png" alt="Ледяная скорбь" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' fill=\'%23334155\' viewBox=\'0 0 16 16\'><path d=\'M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z\'/></svg>'"/>
+          <div class="stock-tag">6 шт.</div>
         </div>
 
-        <div class="rates-box">
-          <div class="rates-header">
-            <span>Период</span>
-            <span>Тариф</span>
+        <div class="card-header">
+          <h2 class="item-name">Ледяная скорбь</h2>
+          <p class="item-buff">Шанс <strong>25% на x2 репутацию</strong> (активирует x4 при серверном x2).</p>
+        </div>
+
+        <div class="rental-selector">
+          <div class="period-toggles">
+            <button class="toggle-btn active" onclick="selectPeriod(this, 'p1')">24ч</button>
+            <button class="toggle-btn" onclick="selectPeriod(this, 'p7')">7 дней</button>
+            <button class="toggle-btn" onclick="selectPeriod(this, 'p30')">30 дней</button>
           </div>
-          <div class="rate-row">
-            <span class="rate-period">24 часа</span>
-            <span class="rate-price"><span class="azp">10 АЗП</span> / <span class="cash">5.000.000$</span></span>
-          </div>
-          <div class="rate-row">
-            <span class="rate-period">7 дней</span>
-            <span class="rate-price"><span class="azp">70 АЗП</span> / <span class="cash">35.000.000$</span></span>
-          </div>
-          <div class="rate-row">
-            <span class="rate-period">30 дней</span>
-            <span class="rate-price"><span class="azp">300 АЗП</span> / <span class="cash">150.000.000$</span></span>
+
+          <div class="price-action-row">
+            <div class="price-data">
+              <span class="price-primary">10 АЗП</span>
+              <span class="price-secondary">или 5.000.000$</span>
+            </div>
+            <button class="rent-btn">Аренда</button>
           </div>
         </div>
       </div>
 
-      <!-- Карточка 3 -->
-      <div class="card" data-category="skin">
-        <div>
-          <div class="card-head">
-            <div class="icon-frame">
-              <img src="./6039.png" alt="Админ-2 [Ж]" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' fill=\'%2364748b\' viewBox=\'0 0 16 16\'><path d=\'M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z\'/></svg>'"/>
-            </div>
-            <div class="card-info">
-              <div class="badges">
-                <span class="badge badge-stock">3 шт.</span>
-                <span class="badge badge-buff-purple">+40% Квесты</span>
-              </div>
-              <h2 class="card-title">Админ-2 [Ж]</h2>
-              <div class="card-subtext">Скин • ID 6039 (Model 651)</div>
-            </div>
-          </div>
-
-          <div class="game-desc-box">
-            Эксклюзивная униформа с бонусом выполнения задач.
-            <div class="desc-buff-highlight">
-              <span>🎯</span>
-              <span>Награды за ежедневные квесты увеличиваются на +40%.</span>
-            </div>
-          </div>
+      <!-- 3. Админ-2 [Ж] -->
+      <div class="card" data-category="skin" data-p1-azp="15" data-p1-cash="7.000.000$" data-p7-azp="105" data-p7-cash="49.000.000$" data-p30-azp="450" data-p30-cash="210.000.000$">
+        <div class="card-visual">
+          <span class="item-id">#6039</span>
+          <div class="visual-glow"></div>
+          <img src="./6039.png" alt="Админ-2 [Ж]" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' fill=\'%23334155\' viewBox=\'0 0 16 16\'><path d=\'M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z\'/></svg>'"/>
+          <div class="stock-tag">3 шт.</div>
         </div>
 
-        <div class="rates-box">
-          <div class="rates-header">
-            <span>Период</span>
-            <span>Тариф</span>
+        <div class="card-header">
+          <h2 class="item-name">Админ-2 [Ж]</h2>
+          <p class="item-buff">Награды за ежедневные квесты <strong>увеличиваются на +40%</strong>.</p>
+        </div>
+
+        <div class="rental-selector">
+          <div class="period-toggles">
+            <button class="toggle-btn active" onclick="selectPeriod(this, 'p1')">24ч</button>
+            <button class="toggle-btn" onclick="selectPeriod(this, 'p7')">7 дней</button>
+            <button class="toggle-btn" onclick="selectPeriod(this, 'p30')">30 дней</button>
           </div>
-          <div class="rate-row">
-            <span class="rate-period">24 часа</span>
-            <span class="rate-price"><span class="azp">15 АЗП</span> / <span class="cash">7.000.000$</span></span>
-          </div>
-          <div class="rate-row">
-            <span class="rate-period">7 дней</span>
-            <span class="rate-price"><span class="azp">105 АЗП</span> / <span class="cash">49.000.000$</span></span>
-          </div>
-          <div class="rate-row">
-            <span class="rate-period">30 дней</span>
-            <span class="rate-price"><span class="azp">450 АЗП</span> / <span class="cash">210.000.000$</span></span>
+
+          <div class="price-action-row">
+            <div class="price-data">
+              <span class="price-primary">15 АЗП</span>
+              <span class="price-secondary">или 7.000.000$</span>
+            </div>
+            <button class="rent-btn">Аренда</button>
           </div>
         </div>
       </div>
 
-      <!-- Карточка 4 -->
-      <div class="card" data-category="skin">
-        <div>
-          <div class="card-head">
-            <div class="icon-frame">
-              <img src="./6041.png" alt="Админ-2 [М]" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' fill=\'%2364748b\' viewBox=\'0 0 16 16\'><path d=\'M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z\'/></svg>'"/>
-            </div>
-            <div class="card-info">
-              <div class="badges">
-                <span class="badge badge-stock">1 шт.</span>
-                <span class="badge badge-buff-purple">+40% Квесты</span>
-              </div>
-              <h2 class="card-title">Админ-2 [М]</h2>
-              <div class="card-subtext">Скин (Синий) • ID 6041</div>
-            </div>
-          </div>
-
-          <div class="game-desc-box">
-            Классический скин администратора со встроенным множителем.
-            <div class="desc-buff-highlight">
-              <span>🎯</span>
-              <span>Награды за ежедневные квесты увеличиваются на +40%.</span>
-            </div>
-          </div>
+      <!-- 4. Админ-2 [М] Синий -->
+      <div class="card" data-category="skin" data-p1-azp="15" data-p1-cash="7.000.000$" data-p7-azp="105" data-p7-cash="49.000.000$" data-p30-azp="450" data-p30-cash="210.000.000$">
+        <div class="card-visual">
+          <span class="item-id">#6041</span>
+          <div class="visual-glow"></div>
+          <img src="./6041.png" alt="Админ-2 [М]" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' fill=\'%23334155\' viewBox=\'0 0 16 16\'><path d=\'M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z\'/></svg>'"/>
+          <div class="stock-tag">1 шт.</div>
         </div>
 
-        <div class="rates-box">
-          <div class="rates-header">
-            <span>Период</span>
-            <span>Тариф</span>
+        <div class="card-header">
+          <h2 class="item-name">Админ-2 [М]</h2>
+          <p class="item-buff">Награды за ежедневные квесты <strong>увеличиваются на +40%</strong>.</p>
+        </div>
+
+        <div class="rental-selector">
+          <div class="period-toggles">
+            <button class="toggle-btn active" onclick="selectPeriod(this, 'p1')">24ч</button>
+            <button class="toggle-btn" onclick="selectPeriod(this, 'p7')">7 дней</button>
+            <button class="toggle-btn" onclick="selectPeriod(this, 'p30')">30 дней</button>
           </div>
-          <div class="rate-row">
-            <span class="rate-period">24 часа</span>
-            <span class="rate-price"><span class="azp">15 АЗП</span> / <span class="cash">7.000.000$</span></span>
-          </div>
-          <div class="rate-row">
-            <span class="rate-period">7 дней</span>
-            <span class="rate-price"><span class="azp">105 АЗП</span> / <span class="cash">49.000.000$</span></span>
-          </div>
-          <div class="rate-row">
-            <span class="rate-period">30 дней</span>
-            <span class="rate-price"><span class="azp">450 АЗП</span> / <span class="cash">210.000.000$</span></span>
+
+          <div class="price-action-row">
+            <div class="price-data">
+              <span class="price-primary">15 АЗП</span>
+              <span class="price-secondary">или 7.000.000$</span>
+            </div>
+            <button class="rent-btn">Аренда</button>
           </div>
         </div>
       </div>
 
-      <!-- Карточка 5 -->
-      <div class="card" data-category="skin">
-        <div>
-          <div class="card-head">
-            <div class="icon-frame">
-              <img src="./6042.png" alt="Админ-3 [М]" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' fill=\'%2364748b\' viewBox=\'0 0 16 16\'><path d=\'M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z\'/></svg>'"/>
-            </div>
-            <div class="card-info">
-              <div class="badges">
-                <span class="badge badge-stock">1 шт.</span>
-                <span class="badge badge-buff-purple">+40% Квесты</span>
-              </div>
-              <h2 class="card-title">Админ-3 [М]</h2>
-              <div class="card-subtext">Скин (Чёрный) • ID 6042</div>
-            </div>
-          </div>
-
-          <div class="game-desc-box">
-            Строгий чёрный вариант экипировки старшего состава.
-            <div class="desc-buff-highlight">
-              <span>🎯</span>
-              <span>Награды за ежедневные квесты увеличиваются на +40%.</span>
-            </div>
-          </div>
+      <!-- 5. Админ-3 [М] Чёрный -->
+      <div class="card" data-category="skin" data-p1-azp="15" data-p1-cash="7.000.000$" data-p7-azp="105" data-p7-cash="48.000.000$" data-p30-azp="450" data-p30-cash="210.000.000$">
+        <div class="card-visual">
+          <span class="item-id">#6042</span>
+          <div class="visual-glow"></div>
+          <img src="./6042.png" alt="Админ-3 [М]" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'48\' height=\'48\' fill=\'%23334155\' viewBox=\'0 0 16 16\'><path d=\'M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z\'/></svg>'"/>
+          <div class="stock-tag">1 шт.</div>
         </div>
 
-        <div class="rates-box">
-          <div class="rates-header">
-            <span>Период</span>
-            <span>Тариф</span>
+        <div class="card-header">
+          <h2 class="item-name">Админ-3 [М]</h2>
+          <p class="item-buff">Награды за ежедневные квесты <strong>увеличиваются на +40%</strong>.</p>
+        </div>
+
+        <div class="rental-selector">
+          <div class="period-toggles">
+            <button class="toggle-btn active" onclick="selectPeriod(this, 'p1')">24ч</button>
+            <button class="toggle-btn" onclick="selectPeriod(this, 'p7')">7 дней</button>
+            <button class="toggle-btn" onclick="selectPeriod(this, 'p30')">30 дней</button>
           </div>
-          <div class="rate-row">
-            <span class="rate-period">24 часа</span>
-            <span class="rate-price"><span class="azp">15 АЗП</span> / <span class="cash">7.000.000$</span></span>
-          </div>
-          <div class="rate-row">
-            <span class="rate-period">7 дней</span>
-            <span class="rate-price"><span class="azp">105 АЗП</span> / <span class="cash">48.000.000$</span></span>
-          </div>
-          <div class="rate-row">
-            <span class="rate-period">30 дней</span>
-            <span class="rate-price"><span class="azp">450 АЗП</span> / <span class="cash">210.000.000$</span></span>
+
+          <div class="price-action-row">
+            <div class="price-data">
+              <span class="price-primary">15 АЗП</span>
+              <span class="price-secondary">или 7.000.000$</span>
+            </div>
+            <button class="rent-btn">Аренда</button>
           </div>
         </div>
       </div>
@@ -624,18 +491,28 @@
   </div>
 
   <script>
-    function filterItems(event, type) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    // Фильтр категорий
+    function filterItems(event, category) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       event.currentTarget.classList.add('active');
 
-      const cards = document.querySelectorAll('.card');
-      cards.forEach(card => {
-        if (type === 'all' || card.dataset.category === type) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
-        }
+      document.querySelectorAll('.card').forEach(card => {
+        card.style.display = (category === 'all' || card.dataset.category === category) ? 'flex' : 'none';
       });
+    }
+
+    // Динамический пересчет цены при выборе срока (24ч / 7д / 30д)
+    function selectPeriod(btn, periodKey) {
+      const card = btn.closest('.card');
+      
+      card.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const azp = card.dataset[`${periodKey}Azp`];
+      const cash = card.dataset[`${periodKey}Cash`];
+
+      card.querySelector('.price-primary').textContent = `${azp} АЗП`;
+      card.querySelector('.price-secondary').textContent = `или ${cash}`;
     }
   </script>
 </body>
