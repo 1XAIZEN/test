@@ -4,7 +4,7 @@
     "title": "Очки «ADMIN»",
     "category": "accessory",
     "image": "./5929.png",
-    "stock": 12,
+    "stock": 5,
     "description": "Шанс <strong>15% получить x2 ЗП</strong> при ответе на входящий репорт.",
     "rates": {
       "d1": { "azp": "10 АЗП", "cash": "5.000.000 $" },
@@ -17,7 +17,7 @@
     "title": "Ледяная скорбь",
     "category": "accessory",
     "image": "./5888.png",
-    "stock": 6,
+    "stock": 2,
     "description": "Шанс <strong>25% на x2 репутацию</strong> (активирует x4 при серверном x2).",
     "rates": {
       "d1": { "azp": "10 АЗП", "cash": "5.000.000 $" },
