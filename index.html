@@ -22,6 +22,7 @@
       
       --accent: #ffffff;
       --green: #22c55e;
+      --yellow: #f59e0b;
       --blue: #60a5fa;
 
       --font: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -126,7 +127,8 @@
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 16px;
+      border-top: 1px solid var(--line);
+      border-left: 1px solid var(--line);
     }
 
     @media (max-width: 480px) {
@@ -136,39 +138,31 @@
     }
 
     .card {
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 20px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding: 24px;
       display: flex;
       flex-direction: column;
-      background: #0d0d0e;
+      background: var(--bg);
       position: relative;
-      overflow: hidden;
-      transition: border-color 0.2s ease, transform 0.2s ease;
+      transition: background 0.2s ease;
     }
 
     .card:hover {
-      border-color: var(--line-hover);
-      transform: translateY(-2px);
-    }
-
-    /* Золотистое свечение в углу как на скриншоте инвентаря */
-    .card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 0% 100%, rgba(212, 160, 23, 0.35) 0%, rgba(138, 97, 10, 0.12) 40%, transparent 65%);
-      pointer-events: none;
-      z-index: 1;
+      background: var(--surface);
     }
 
     .card-meta {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
-      position: relative;
-      z-index: 2;
+      margin-bottom: 24px;
+    }
+
+    .item-id-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .item-id {
@@ -177,36 +171,48 @@
       color: var(--text-muted);
     }
 
-    /* Бейджи таймера и категории */
-    .badge-group {
-      display: flex;
-      gap: 6px;
-      align-items: center;
+    .item-buff {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      background: var(--surface-subtle);
+      border: 1px solid var(--line);
+      color: var(--text);
+      padding: 1px 6px;
+      border-radius: 4px;
     }
 
-    .badge-status {
+    .item-stock {
       font-family: var(--mono);
       font-size: 11px;
-      font-weight: 500;
-      background: rgba(0, 0, 0, 0.65);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 3px 8px;
-      border-radius: 9999px;
-      color: #dedede;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .badge-status.rented {
+    .item-stock::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .item-stock.rented {
       color: #fbbf24;
-      border-color: rgba(251, 191, 36, 0.25);
     }
 
-    .badge-type {
-      font-size: 12px;
-      background: rgba(0, 0, 0, 0.65);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 2px 6px;
-      border-radius: 9999px;
-      line-height: 1;
+    .item-stock.rented::before {
+      background: var(--yellow);
+    }
+
+    .item-stock.empty {
+      color: var(--text-muted);
+    }
+
+    .item-stock.empty::before {
+      background: var(--text-muted);
     }
 
     .image-stage {
@@ -214,9 +220,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 16px;
-      position: relative;
-      z-index: 2;
+      margin-bottom: 24px;
     }
 
     .image-stage img {
@@ -232,9 +236,7 @@
     }
 
     .card-content {
-      margin-bottom: 20px;
-      position: relative;
-      z-index: 2;
+      margin-bottom: 28px;
     }
 
     .item-name {
@@ -256,13 +258,7 @@
       margin-top: auto;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      position: relative;
-      z-index: 2;
-      background: rgba(0, 0, 0, 0.35);
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px solid var(--line);
+      gap: 16px;
     }
 
     .period-list {
@@ -299,7 +295,8 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      padding-top: 4px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
     }
 
     .price-row {
@@ -337,7 +334,7 @@
     <header>
       <div class="brand-group">
         <span class="system-label">Mikki Tyler | Лавка</span>
-        <h1 class="brand-title">Аренда аксессуаров и скинов</h1>
+        <h1 class="brand-title">Лавка аренды</h1>
       </div>
 
       <div class="nav-tabs">
@@ -365,7 +362,6 @@
       }
     }
 
-    // Склонение числительных (1 день, 2 дня, 5 дней)
     function pluralize(n, forms) {
       const mod10 = n % 10;
       const mod100 = n % 100;
@@ -375,30 +371,29 @@
       return `${n} ${forms[2]}`;
     }
 
-    // Автоматический расчёт остатка срока
-    function formatTimeRemaining(rentUntil, stock) {
-      if (!rentUntil) {
+    function calcTimeRemaining(dateStr, stock) {
+      if (!dateStr) {
         return {
           text: stock > 0 ? `${stock} шт.` : 'Нет в наличии',
-          isRented: false
+          className: stock > 0 ? '' : 'empty'
         };
       }
 
-      const diff = new Date(rentUntil) - new Date();
+      const diff = new Date(dateStr) - new Date();
       if (diff <= 0) {
-        return { text: 'Срок истёк', isRented: false };
+        return { text: 'Срок истёк', className: 'empty' };
       }
 
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
       const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const minutes = Math.floor((diff / 1000 / 60) % 60);
 
       let text = '';
       if (days > 0) text = pluralize(days, ['день', 'дня', 'дней']);
       else if (hours > 0) text = pluralize(hours, ['час', 'часа', 'часов']);
       else text = pluralize(minutes, ['минута', 'минуты', 'минут']);
 
-      return { text, isRented: true };
+      return { text: `Аренда: ${text}`, className: 'rented' };
     }
 
     function updateCounters() {
@@ -416,8 +411,8 @@
         : rawItems.filter(i => i.category === activeFilter);
 
       items.forEach(item => {
-        const timeInfo = formatTimeRemaining(item.rentUntil, item.stock);
-        const typeIcon = item.category === 'skin' ? '👕' : '⏱️';
+        const timeInfo = calcTimeRemaining(item.rentUntil, item.stock);
+        const buffBadge = item.buff ? `<span class="item-buff">${item.buff}</span>` : '';
 
         const card = document.createElement('div');
         card.className = 'card';
@@ -425,11 +420,11 @@
 
         card.innerHTML = `
           <div class="card-meta">
-            <span class="item-id">#${item.id}</span>
-            <div class="badge-group">
-              <span class="badge-status ${timeInfo.isRented ? 'rented' : ''}">${timeInfo.text}</span>
-              <span class="badge-type">${typeIcon}</span>
+            <div class="item-id-group">
+              <span class="item-id">#${item.id}</span>
+              ${buffBadge}
             </div>
+            <span class="item-stock ${timeInfo.className}">${timeInfo.text}</span>
           </div>
 
           <div class="image-stage">
