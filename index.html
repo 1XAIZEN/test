@@ -160,27 +160,10 @@
       gap: 12px;
     }
 
-    .item-id-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
     .item-id {
       font-family: var(--mono);
       font-size: 11px;
       color: var(--text-muted);
-    }
-
-    .item-buff {
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 600;
-      background: var(--surface-subtle);
-      border: 1px solid var(--line);
-      color: var(--text);
-      padding: 1px 6px;
-      border-radius: 4px;
     }
 
     .item-status-col {
@@ -397,7 +380,6 @@
 
     function calculateInventory(totalStock, rentsList = []) {
       const now = new Date();
-      // Находим все актуальные активные аренды
       const validRents = rentsList
         .map(d => new Date(d))
         .filter(d => !isNaN(d) && d > now)
@@ -427,7 +409,6 @@
       items.forEach(item => {
         const inv = calculateInventory(item.stock || 0, item.activeRents || []);
         const inStock = inv.availableStock > 0;
-        const buffBadge = item.buff ? `<span class="item-buff">${item.buff}</span>` : '';
 
         let rentBadgeHtml = '';
         if (inv.rentedCount > 0) {
@@ -441,10 +422,7 @@
 
         card.innerHTML = `
           <div class="card-meta">
-            <div class="item-id-group">
-              <span class="item-id">#${item.id}</span>
-              ${buffBadge}
-            </div>
+            <span class="item-id">#${item.id}</span>
             <div class="item-status-col">
               <span class="item-stock ${!inStock ? 'empty' : ''}">
                 ${inStock ? `${inv.availableStock} шт. в наличии` : 'Нет в наличии'}
