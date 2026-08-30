@@ -155,8 +155,9 @@
     .card-meta {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       margin-bottom: 24px;
+      gap: 12px;
     }
 
     .item-id-group {
@@ -182,6 +183,13 @@
       border-radius: 4px;
     }
 
+    .item-status-col {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
     .item-stock {
       font-family: var(--mono);
       font-size: 11px;
@@ -199,20 +207,23 @@
       background: var(--green);
     }
 
-    .item-stock.rented {
-      color: #fbbf24;
-    }
-
-    .item-stock.rented::before {
-      background: var(--yellow);
-    }
-
     .item-stock.empty {
       color: var(--text-muted);
     }
 
     .item-stock.empty::before {
       background: var(--text-muted);
+    }
+
+    .rent-info {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--yellow);
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
     }
 
     .image-stage {
@@ -371,29 +382,32 @@
       return `${n} ${forms[2]}`;
     }
 
-    function calcTimeRemaining(dateStr, stock) {
-      if (!dateStr) {
-        return {
-          text: stock > 0 ? `${stock} шт.` : 'Нет в наличии',
-          className: stock > 0 ? '' : 'empty'
-        };
-      }
-
+    function formatTimeRemaining(dateStr) {
       const diff = new Date(dateStr) - new Date();
-      if (diff <= 0) {
-        return { text: 'Срок истёк', className: 'empty' };
-      }
+      if (diff <= 0) return null;
 
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
       const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
       const minutes = Math.floor((diff / 1000 / 60) % 60);
 
-      let text = '';
-      if (days > 0) text = pluralize(days, ['день', 'дня', 'дней']);
-      else if (hours > 0) text = pluralize(hours, ['час', 'часа', 'часов']);
-      else text = pluralize(minutes, ['минута', 'минуты', 'минут']);
+      if (days > 0) return pluralize(days, ['день', 'дня', 'дней']);
+      if (hours > 0) return pluralize(hours, ['час', 'часа', 'часов']);
+      return pluralize(minutes, ['минута', 'минуты', 'минут']);
+    }
 
-      return { text: `Аренда: ${text}`, className: 'rented' };
+    function calculateInventory(totalStock, rentsList = []) {
+      const now = new Date();
+      // Находим все актуальные активные аренды
+      const validRents = rentsList
+        .map(d => new Date(d))
+        .filter(d => !isNaN(d) && d > now)
+        .sort((a, b) => a - b);
+
+      const rentedCount = validRents.length;
+      const availableStock = Math.max(0, totalStock - rentedCount);
+      const nearestRentText = rentedCount > 0 ? formatTimeRemaining(validRents[0]) : null;
+
+      return { availableStock, rentedCount, nearestRentText };
     }
 
     function updateCounters() {
@@ -411,8 +425,15 @@
         : rawItems.filter(i => i.category === activeFilter);
 
       items.forEach(item => {
-        const timeInfo = calcTimeRemaining(item.rentUntil, item.stock);
+        const inv = calculateInventory(item.stock || 0, item.activeRents || []);
+        const inStock = inv.availableStock > 0;
         const buffBadge = item.buff ? `<span class="item-buff">${item.buff}</span>` : '';
+
+        let rentBadgeHtml = '';
+        if (inv.rentedCount > 0) {
+          const detail = inv.nearestRentText ? ` (до ${inv.nearestRentText})` : '';
+          rentBadgeHtml = `<span class="rent-info">Сдано: ${inv.rentedCount} шт.${detail}</span>`;
+        }
 
         const card = document.createElement('div');
         card.className = 'card';
@@ -424,7 +445,12 @@
               <span class="item-id">#${item.id}</span>
               ${buffBadge}
             </div>
-            <span class="item-stock ${timeInfo.className}">${timeInfo.text}</span>
+            <div class="item-status-col">
+              <span class="item-stock ${!inStock ? 'empty' : ''}">
+                ${inStock ? `${inv.availableStock} шт. в наличии` : 'Нет в наличии'}
+              </span>
+              ${rentBadgeHtml}
+            </div>
           </div>
 
           <div class="image-stage">
