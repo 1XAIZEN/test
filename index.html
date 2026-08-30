@@ -170,7 +170,7 @@
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 4px;
+      gap: 5px;
     }
 
     .item-stock {
@@ -204,9 +204,10 @@
       color: var(--yellow);
       background: rgba(245, 158, 11, 0.08);
       border: 1px solid rgba(245, 158, 11, 0.2);
-      padding: 2px 6px;
+      padding: 3px 7px;
       border-radius: 4px;
-      white-space: nowrap;
+      text-align: right;
+      line-height: 1.4;
     }
 
     .image-stage {
@@ -356,30 +357,20 @@
       }
     }
 
-    function pluralize(n, forms) {
-      const mod10 = n % 10;
-      const mod100 = n % 100;
-      if (mod100 >= 11 && mod100 <= 19) return `${n} ${forms[2]}`;
-      if (mod10 === 1) return `${n} ${forms[0]}`;
-      if (mod10 >= 2 && mod10 <= 4) return `${n} ${forms[1]}`;
-      return `${n} ${forms[2]}`;
-    }
-
-    function formatTimeRemaining(dateStr) {
-      const diff = new Date(dateStr) - new Date();
-      if (diff <= 0) return null;
-
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((diff / 1000 / 60) % 60);
-
-      if (days > 0) return pluralize(days, ['день', 'дня', 'дней']);
-      if (hours > 0) return pluralize(hours, ['час', 'часа', 'часов']);
-      return pluralize(minutes, ['минута', 'минуты', 'минут']);
+    // Форматирование даты в вид: ДД.ММ.ГГГГ ЧЧ:ММ
+    function formatDateTime(dateObj) {
+      const pad = (n) => String(n).padStart(2, '0');
+      const day = pad(dateObj.getDate());
+      const month = pad(dateObj.getMonth() + 1);
+      const year = dateObj.getFullYear();
+      const hours = pad(dateObj.getHours());
+      const minutes = pad(dateObj.getMinutes());
+      return `${day}.${month}.${year} ${hours}:${minutes}`;
     }
 
     function calculateInventory(totalStock, rentsList = []) {
       const now = new Date();
+      // Выбираем только те аренды, срок которых ещё не закончился
       const validRents = rentsList
         .map(d => new Date(d))
         .filter(d => !isNaN(d) && d > now)
@@ -387,9 +378,9 @@
 
       const rentedCount = validRents.length;
       const availableStock = Math.max(0, totalStock - rentedCount);
-      const nearestRentText = rentedCount > 0 ? formatTimeRemaining(validRents[0]) : null;
+      const formattedDates = validRents.map(formatDateTime);
 
-      return { availableStock, rentedCount, nearestRentText };
+      return { availableStock, rentedCount, formattedDates };
     }
 
     function updateCounters() {
@@ -412,8 +403,8 @@
 
         let rentBadgeHtml = '';
         if (inv.rentedCount > 0) {
-          const detail = inv.nearestRentText ? ` (до ${inv.nearestRentText})` : '';
-          rentBadgeHtml = `<span class="rent-info">Сдано: ${inv.rentedCount} шт.${detail}</span>`;
+          const datesStr = inv.formattedDates.join(', ');
+          rentBadgeHtml = `<span class="rent-info">Сдано: ${inv.rentedCount} шт. (${datesStr})</span>`;
         }
 
         const card = document.createElement('div');
