@@ -4,7 +4,7 @@
     "title": "Очки «ADMIN»",
     "category": "accessory",
     "image": "./5929.png",
-    "stock": 3,
+    "stock": 12,
     "description": "Шанс <strong>15% получить x2 ЗП</strong> при ответе на входящий репорт.",
     "rates": {
       "d1": { "azp": "10 АЗП", "cash": "5.000.000 $" },
