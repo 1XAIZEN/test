@@ -22,7 +22,7 @@
       
       --accent: #ffffff;
       --green: #22c55e;
-      --yellow: #f59e0b;
+      --yellow: #eab308;
       --blue: #60a5fa;
 
       --font: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -155,22 +155,14 @@
     .card-meta {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       margin-bottom: 24px;
-      gap: 12px;
     }
 
     .item-id {
       font-family: var(--mono);
       font-size: 11px;
       color: var(--text-muted);
-    }
-
-    .item-status-col {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 5px;
     }
 
     .item-stock {
@@ -180,6 +172,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      white-space: nowrap;
     }
 
     .item-stock::before {
@@ -188,6 +181,15 @@
       height: 5px;
       border-radius: 50%;
       background: var(--green);
+      flex-shrink: 0;
+    }
+
+    .item-stock.rented {
+      color: var(--yellow);
+    }
+
+    .item-stock.rented::before {
+      background: var(--yellow);
     }
 
     .item-stock.empty {
@@ -196,18 +198,6 @@
 
     .item-stock.empty::before {
       background: var(--text-muted);
-    }
-
-    .rent-info {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--yellow);
-      background: rgba(245, 158, 11, 0.08);
-      border: 1px solid rgba(245, 158, 11, 0.2);
-      padding: 3px 7px;
-      border-radius: 4px;
-      text-align: right;
-      line-height: 1.4;
     }
 
     .image-stage {
@@ -357,20 +347,18 @@
       }
     }
 
-    // Форматирование даты в вид: ДД.ММ.ГГГГ ЧЧ:ММ
-    function formatDateTime(dateObj) {
+    // Формат: "02.09 в 15:00"
+    function formatShortDate(dateObj) {
       const pad = (n) => String(n).padStart(2, '0');
       const day = pad(dateObj.getDate());
       const month = pad(dateObj.getMonth() + 1);
-      const year = dateObj.getFullYear();
       const hours = pad(dateObj.getHours());
       const minutes = pad(dateObj.getMinutes());
-      return `${day}.${month}.${year} ${hours}:${minutes}`;
+      return `${day}.${month} в ${hours}:${minutes}`;
     }
 
-    function calculateInventory(totalStock, rentsList = []) {
+    function calculateStatus(totalStock, rentsList = []) {
       const now = new Date();
-      // Выбираем только те аренды, срок которых ещё не закончился
       const validRents = rentsList
         .map(d => new Date(d))
         .filter(d => !isNaN(d) && d > now)
@@ -378,9 +366,37 @@
 
       const rentedCount = validRents.length;
       const availableStock = Math.max(0, totalStock - rentedCount);
-      const formattedDates = validRents.map(formatDateTime);
+      const nextAvailableDate = validRents.length > 0 ? formatShortDate(validRents[0]) : null;
 
-      return { availableStock, rentedCount, formattedDates };
+      // Если в наличии ничего нет, но есть дата возврата
+      if (availableStock === 0 && nextAvailableDate) {
+        return {
+          text: `До ${nextAvailableDate}`,
+          className: 'rented'
+        };
+      }
+
+      // Если товара нет вообще
+      if (availableStock === 0) {
+        return {
+          text: 'Нет в наличии',
+          className: 'empty'
+        };
+      }
+
+      // Если в наличии есть, но часть сдана
+      if (rentedCount > 0) {
+        return {
+          text: `${availableStock} шт. (след. ${nextAvailableDate})`,
+          className: ''
+        };
+      }
+
+      // Все в наличии
+      return {
+        text: `${availableStock} шт.`,
+        className: ''
+      };
     }
 
     function updateCounters() {
@@ -398,14 +414,7 @@
         : rawItems.filter(i => i.category === activeFilter);
 
       items.forEach(item => {
-        const inv = calculateInventory(item.stock || 0, item.activeRents || []);
-        const inStock = inv.availableStock > 0;
-
-        let rentBadgeHtml = '';
-        if (inv.rentedCount > 0) {
-          const datesStr = inv.formattedDates.join(', ');
-          rentBadgeHtml = `<span class="rent-info">Сдано: ${inv.rentedCount} шт. (${datesStr})</span>`;
-        }
+        const status = calculateStatus(item.stock || 0, item.activeRents || []);
 
         const card = document.createElement('div');
         card.className = 'card';
@@ -414,12 +423,9 @@
         card.innerHTML = `
           <div class="card-meta">
             <span class="item-id">#${item.id}</span>
-            <div class="item-status-col">
-              <span class="item-stock ${!inStock ? 'empty' : ''}">
-                ${inStock ? `${inv.availableStock} шт. в наличии` : 'Нет в наличии'}
-              </span>
-              ${rentBadgeHtml}
-            </div>
+            <span class="item-stock ${status.className}">
+              ${status.text}
+            </span>
           </div>
 
           <div class="image-stage">
