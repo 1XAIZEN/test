@@ -131,10 +131,6 @@
       gap: 6px;
     }
 
-    .tab.hidden {
-      display: none !important;
-    }
-
     .tab .count {
       font-family: var(--mono);
       font-size: 11px;
@@ -398,6 +394,7 @@
       line-height: 1.5;
       color: var(--text-dim);
       min-height: 38px;
+      white-space: pre-line;
     }
 
     .item-bottom {
@@ -489,10 +486,10 @@
       </div>
 
       <div class="nav-tabs" id="mode-tabs">
-        <button class="tab active" onclick="setMode('all', this)">Все <span class="count" id="m-all"></span></button>
-        <button class="tab" onclick="setMode('rent', this)">Аренда <span class="count" id="m-rent"></span></button>
-        <button class="tab" onclick="setMode('sell', this)">Продажа <span class="count" id="m-sell"></span></button>
-        <button class="tab" onclick="setMode('buy', this)">Скупка <span class="count" id="m-buy"></span></button>
+        <button class="tab active" onclick="setMode('all', this)">Все <span class="count" id="m-all">0</span></button>
+        <button class="tab" onclick="setMode('rent', this)">Аренда <span class="count" id="m-rent">0</span></button>
+        <button class="tab" onclick="setMode('sell', this)">Продажа <span class="count" id="m-sell">0</span></button>
+        <button class="tab" onclick="setMode('buy', this)">Скупка <span class="count" id="m-buy">0</span></button>
       </div>
     </header>
 
@@ -500,14 +497,6 @@
       <div class="toolbar-row">
         <div class="nav-tabs" id="cat-tabs">
           <button class="tab active" onclick="setCategory('all', this)">Все категории</button>
-          <button class="tab" id="tab-accessory" onclick="setCategory('accessory', this)">Аксессуары</button>
-          <button class="tab" id="tab-skin" onclick="setCategory('skin', this)">Скины</button>
-          <button class="tab" id="tab-armor" onclick="setCategory('armor', this)">Бронежилеты и сумки</button>
-          <button class="tab" id="tab-weapon" onclick="setCategory('weapon', this)">Оружие</button>
-          <button class="tab" id="tab-vinyl" onclick="setCategory('vinyl', this)">Винилы</button>
-          <button class="tab" id="tab-potion" onclick="setCategory('potion', this)">Зелья</button>
-          <button class="tab" id="tab-nft" onclick="setCategory('nft', this)">NFT</button>
-          <button class="tab" id="tab-other" onclick="setCategory('other', this)">Прочее</button>
         </div>
 
         <div class="toolbar-actions">
@@ -537,6 +526,18 @@
   </div>
 
   <script>
+    const CATEGORY_NAMES = {
+      cases: 'Рулетки и ларцы',
+      accessory: 'Аксессуары',
+      skin: 'Скины',
+      armor: 'Бронежилеты и сумки',
+      weapon: 'Оружие',
+      vinyl: 'Винилы',
+      potion: 'Зелья',
+      nft: 'NFT',
+      other: 'Прочее'
+    };
+
     let rawItems = [];
     let activeMode = 'all';
     let activeCategory = 'all';
@@ -580,15 +581,18 @@
 
           const tLower = cleanName(item.title);
 
-          if (apiMatch) {
-            resolvedId = resolvedId || String(apiMatch.id);
-            resolvedIcon = apiMatch.icon || resolvedIcon;
-
-            if (!resolvedCategory) {
+          if (!resolvedCategory) {
+            if (apiMatch) {
               if (apiMatch.type === 8) {
                 resolvedCategory = 'skin';
               } else if (apiMatch.acs_slot !== undefined && apiMatch.acs_slot >= 0) {
                 resolvedCategory = 'accessory';
+              }
+            }
+
+            if (!resolvedCategory) {
+              if (tLower.includes('рулетк') || tLower.includes('ларец') || tLower.includes('ящик') || tLower.includes('кейс') || tLower.includes('box')) {
+                resolvedCategory = 'cases';
               } else if (tLower.includes('бронежилет') || tLower.includes('сумка') || tLower.includes('рюкзак') || tLower.includes('портфель') || tLower.includes('чемодан')) {
                 resolvedCategory = 'armor';
               } else if (tLower.includes('оружие') || tLower.includes('пистолет') || tLower.includes('автомат') || tLower.includes('винтовка') || tLower.includes('обрет') || tLower.includes('м4') || tLower.includes('дигл') || tLower.includes('shotgun') || tLower.includes('rifle') || tLower.includes('katana') || tLower.includes('бита')) {
@@ -603,22 +607,11 @@
                 resolvedCategory = 'other';
               }
             }
-          } else {
-            if (!resolvedCategory) {
-              if (tLower.includes('бронежилет') || tLower.includes('сумка') || tLower.includes('рюкзак') || tLower.includes('портфель') || tLower.includes('чемодан')) {
-                resolvedCategory = 'armor';
-              } else if (tLower.includes('оружие') || tLower.includes('пистолет') || tLower.includes('автомат') || tLower.includes('винтовка') || tLower.includes('м4') || tLower.includes('дигл') || tLower.includes('katana') || tLower.includes('бита')) {
-                resolvedCategory = 'weapon';
-              } else if (tLower.includes('винил') || tLower.includes('наклейка')) {
-                resolvedCategory = 'vinyl';
-              } else if (tLower.includes('зелье') || tLower.includes('сироп') || tLower.includes('эликсир')) {
-                resolvedCategory = 'potion';
-              } else if (tLower.includes('nft') || tLower.includes('нфт')) {
-                resolvedCategory = 'nft';
-              } else {
-                resolvedCategory = 'other';
-              }
-            }
+          }
+
+          if (apiMatch) {
+            resolvedId = resolvedId || String(apiMatch.id);
+            resolvedIcon = apiMatch.icon || resolvedIcon;
           }
 
           return {
@@ -630,29 +623,33 @@
         });
 
         updateCounters();
-        checkCategoryVisibility();
+        renderCategoryTabs();
         render();
       } catch (e) {
         console.error('Ошибка инициализации данных:', e);
       }
     }
 
-    function checkCategoryVisibility() {
-      const categories = ['accessory', 'skin', 'armor', 'weapon', 'vinyl', 'potion', 'nft', 'other'];
-      categories.forEach(cat => {
-        const hasItems = rawItems.some(item => item.category === cat);
-        const tabEl = document.getElementById(`tab-${cat}`);
-        if (tabEl) {
-          if (!hasItems) {
-            tabEl.classList.add('hidden');
-            if (activeCategory === cat) {
-              setCategory('all', document.querySelector('#cat-tabs .tab'));
-            }
-          } else {
-            tabEl.classList.remove('hidden');
-          }
+    function renderCategoryTabs() {
+      const container = document.getElementById('cat-tabs');
+      const presentCategories = new Set(rawItems.map(item => item.category));
+
+      container.innerHTML = `<button class="tab ${activeCategory === 'all' ? 'active' : ''}" onclick="setCategory('all', this)">Все категории</button>`;
+
+      Object.entries(CATEGORY_NAMES).forEach(([key, title]) => {
+        if (presentCategories.has(key)) {
+          const btn = document.createElement('button');
+          btn.className = `tab ${activeCategory === key ? 'active' : ''}`;
+          btn.textContent = title;
+          btn.onclick = () => setCategory(key, btn);
+          container.appendChild(btn);
         }
       });
+
+      if (activeCategory !== 'all' && !presentCategories.has(activeCategory)) {
+        activeCategory = 'all';
+        container.querySelector('.tab').classList.add('active');
+      }
     }
 
     function formatTimeLeft(targetDate) {
