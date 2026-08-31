@@ -17,8 +17,8 @@
       --line-hover: #333333;
       
       --text: #ededed;
-      --text-dim: #888888;
-      --text-muted: #555555;
+      --text-dim: #999999;
+      --text-muted: #666666;
       
       --accent: #ffffff;
       --green: #22c55e;
@@ -169,20 +169,20 @@
 
     .item-stock {
       font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text-dim);
       display: flex;
       flex-direction: column;
       align-items: flex-end;
       text-align: right;
-      line-height: 1.35;
+      line-height: 1.4;
     }
 
     .stock-main {
       display: flex;
       align-items: center;
       gap: 6px;
+      font-size: 12px;
       font-weight: 500;
+      color: var(--text);
     }
 
     .stock-main::before {
@@ -194,10 +194,12 @@
       flex-shrink: 0;
     }
 
+    /* Увеличенный и более контрастный текст времени */
     .stock-sub {
-      font-size: 10px;
-      color: var(--text-muted);
-      margin-top: 3px;
+      font-size: 11.5px;
+      color: var(--text-dim);
+      margin-top: 4px;
+      letter-spacing: -0.01em;
     }
 
     .item-stock.rented .stock-main {
@@ -365,7 +367,7 @@
 
     function formatTimeLeft(targetDate) {
       const diffMs = targetDate - new Date();
-      if (diffMs <= 0) return 'сейчас';
+      if (diffMs <= 0) return 'прямо сейчас';
 
       const diffMins = Math.floor(diffMs / 60000);
       const days = Math.floor(diffMins / (60 * 24));
@@ -395,8 +397,8 @@
       // 1. Все сдано в аренду (в наличии 0, но скоро освободится)
       if (availableStock === 0 && nextDate) {
         return {
-          main: 'Занято',
-          sub: `Освободится ${formatTimeLeft(nextDate)}`,
+          main: 'Все заняты',
+          sub: `Слетит ${formatTimeLeft(nextDate)}`,
           className: 'rented'
         };
       }
@@ -414,7 +416,7 @@
       if (rentedCount > 0) {
         return {
           main: `В наличии: ${availableStock} из ${totalStock} шт.`,
-          sub: `След. возврат ${formatTimeLeft(nextDate)}`,
+          sub: `Слетит ${formatTimeLeft(nextDate)}`,
           className: ''
         };
       }
