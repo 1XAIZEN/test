@@ -20,10 +20,10 @@
       --text-dim: #999999;
       --text-muted: #666666;
       
-      --accent: #ffffff;
       --green: #22c55e;
       --yellow: #eab308;
-      --blue: #60a5fa;
+      --blue: #3b82f6;
+      --purple: #a855f7;
 
       --font: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
       --mono: 'Geist Mono', monospace;
@@ -56,7 +56,7 @@
       align-items: flex-end;
       gap: 24px;
       flex-wrap: wrap;
-      margin-bottom: 48px;
+      margin-bottom: 28px;
     }
 
     .brand-group {
@@ -80,13 +80,21 @@
       color: var(--text);
     }
 
-    .nav-tabs {
+    .controls-container {
       display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 40px;
+    }
+
+    .nav-tabs {
+      display: inline-flex;
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: 9999px;
       padding: 3px;
       gap: 2px;
+      width: fit-content;
     }
 
     .tab {
@@ -160,12 +168,31 @@
       margin-bottom: 24px;
     }
 
+    .meta-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .item-id {
       font-family: var(--mono);
       font-size: 11px;
       color: var(--text-muted);
-      flex-shrink: 0;
     }
+
+    .mode-badge {
+      font-family: var(--mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .mode-rent { background: rgba(34, 197, 94, 0.1); color: var(--green); border: 1px solid rgba(34, 197, 94, 0.2); }
+    .mode-sell { background: rgba(59, 130, 246, 0.1); color: var(--blue); border: 1px solid rgba(59, 130, 246, 0.2); }
+    .mode-buy { background: rgba(168, 85, 247, 0.1); color: var(--purple); border: 1px solid rgba(168, 85, 247, 0.2); }
 
     .item-stock {
       font-family: var(--mono);
@@ -201,21 +228,10 @@
       letter-spacing: -0.01em;
     }
 
-    .item-stock.rented .stock-main {
-      color: var(--yellow);
-    }
-
-    .item-stock.rented .stock-main::before {
-      background: var(--yellow);
-    }
-
-    .item-stock.empty .stock-main {
-      color: var(--text-muted);
-    }
-
-    .item-stock.empty .stock-main::before {
-      background: var(--text-muted);
-    }
+    .item-stock.rented .stock-main { color: var(--yellow); }
+    .item-stock.rented .stock-main::before { background: var(--yellow); }
+    .item-stock.empty .stock-main { color: var(--text-muted); }
+    .item-stock.empty .stock-main::before { background: var(--text-muted); }
 
     .image-stage {
       height: 140px;
@@ -284,13 +300,18 @@
       transition: all 0.15s ease;
     }
 
-    .period-btn:hover {
-      color: var(--text);
-    }
+    .period-btn:hover { color: var(--text); }
+    .period-btn.active { background: var(--surface-subtle); color: var(--text); }
 
-    .period-btn.active {
-      background: var(--surface-subtle);
-      color: var(--text);
+    .deal-label-box {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 6px;
+      background: var(--surface);
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
     }
 
     .pricing-table {
@@ -336,22 +357,35 @@
     <header>
       <div class="brand-group">
         <span class="system-label">Mikki Tyler | Лавка</span>
-        <h1 class="brand-title">Лавка аренды</h1>
+        <h1 class="brand-title">Торговля и аренда</h1>
       </div>
 
-      <div class="nav-tabs">
-        <button class="tab active" onclick="setFilter('all', this)">Все <span class="count" id="c-all"></span></button>
-        <button class="tab" onclick="setFilter('accessory', this)">Аксессуары <span class="count" id="c-acc"></span></button>
-        <button class="tab" onclick="setFilter('skin', this)">Скины <span class="count" id="c-skn"></span></button>
+      <!-- Вкладки типов операций -->
+      <div class="nav-tabs" id="mode-tabs">
+        <button class="tab active" onclick="setMode('all', this)">Все <span class="count" id="m-all"></span></button>
+        <button class="tab" onclick="setMode('rent', this)">Аренда <span class="count" id="m-rent"></span></button>
+        <button class="tab" onclick="setMode('sell', this)">Продажа <span class="count" id="m-sell"></span></button>
+        <button class="tab" onclick="setMode('buy', this)">Скупка <span class="count" id="m-buy"></span></button>
       </div>
     </header>
+
+    <!-- Вкладки категорий предметов -->
+    <div class="controls-container">
+      <div class="nav-tabs" id="cat-tabs">
+        <button class="tab active" onclick="setCategory('all', this)">Все категории</button>
+        <button class="tab" onclick="setCategory('accessory', this)">Аксессуары</button>
+        <button class="tab" onclick="setCategory('skin', this)">Скины</button>
+        <button class="tab" onclick="setCategory('other', this)">Прочее</button>
+      </div>
+    </div>
 
     <div class="grid" id="grid"></div>
   </div>
 
   <script>
     let rawItems = [];
-    let activeFilter = 'all';
+    let activeMode = 'all';
+    let activeCategory = 'all';
 
     async function init() {
       try {
@@ -373,76 +407,106 @@
       const hours = Math.floor((diffMins % (60 * 24)) / 60);
       const mins = diffMins % 60;
 
-      if (days > 0) {
-        return hours > 0 ? `через ${days} д ${hours} ч` : `через ${days} д`;
-      }
-      if (hours > 0) {
-        return mins > 0 ? `через ${hours} ч ${mins} мин` : `через ${hours} ч`;
-      }
+      if (days > 0) return hours > 0 ? `через ${days} д ${hours} ч` : `через ${days} д`;
+      if (hours > 0) return mins > 0 ? `через ${hours} ч ${mins} мин` : `через ${hours} ч`;
       return `через ${mins} мин`;
     }
 
-    function calculateStatus(totalStock, rentsList = []) {
+    function calculateStatus(item) {
+      const mode = item.mode || 'rent';
+
+      if (mode === 'buy') {
+        return {
+          main: `Куплю: ${item.targetStock || 1} шт.`,
+          sub: 'Выкуп сразу',
+          className: ''
+        };
+      }
+
+      if (mode === 'sell') {
+        const stock = item.stock || 0;
+        if (stock === 0) return { main: 'Распродано', sub: '', className: 'empty' };
+        return {
+          main: `В наличии: ${stock} шт.`,
+          sub: 'Штучная продажа',
+          className: ''
+        };
+      }
+
+      // Режим аренды
       const now = new Date();
-      const validRents = rentsList
+      const validRents = (item.activeRents || [])
         .map(d => new Date(d))
         .filter(d => !isNaN(d) && d > now)
         .sort((a, b) => a - b);
 
+      const totalStock = item.stock || 0;
       const rentedCount = validRents.length;
       const availableStock = Math.max(0, totalStock - rentedCount);
       const nextDate = validRents.length > 0 ? validRents[0] : null;
 
       if (availableStock === 0 && nextDate) {
-        return {
-          main: 'Все заняты',
-          sub: `Слетит ${formatTimeLeft(nextDate)}`,
-          className: 'rented'
-        };
+        return { main: 'Все заняты', sub: `Слетит ${formatTimeLeft(nextDate)}`, className: 'rented' };
       }
-
       if (availableStock === 0) {
-        return {
-          main: 'Нет в наличии',
-          sub: '',
-          className: 'empty'
-        };
+        return { main: 'Нет в наличии', sub: '', className: 'empty' };
       }
-
       if (rentedCount > 0) {
-        return {
-          main: `В наличии: ${availableStock} из ${totalStock} шт.`,
-          sub: `Слетит ${formatTimeLeft(nextDate)}`,
-          className: ''
-        };
+        return { main: `В наличии: ${availableStock} из ${totalStock} шт.`, sub: `Слетит ${formatTimeLeft(nextDate)}`, className: '' };
       }
-
-      return {
-        main: `В наличии: ${availableStock} шт.`,
-        sub: '',
-        className: ''
-      };
+      return { main: `В наличии: ${availableStock} шт.`, sub: '', className: '' };
     }
 
     function updateCounters() {
-      document.getElementById('c-all').textContent = rawItems.length;
-      document.getElementById('c-acc').textContent = rawItems.filter(i => i.category === 'accessory').length;
-      document.getElementById('c-skn').textContent = rawItems.filter(i => i.category === 'skin').length;
+      document.getElementById('m-all').textContent = rawItems.length;
+      document.getElementById('m-rent').textContent = rawItems.filter(i => (i.mode || 'rent') === 'rent').length;
+      document.getElementById('m-sell').textContent = rawItems.filter(i => i.mode === 'sell').length;
+      document.getElementById('m-buy').textContent = rawItems.filter(i => i.mode === 'buy').length;
     }
 
     function render() {
       const container = document.getElementById('grid');
       container.innerHTML = '';
 
-      const items = activeFilter === 'all' 
-        ? rawItems 
-        : rawItems.filter(i => i.category === activeFilter);
+      const items = rawItems.filter(item => {
+        const matchMode = activeMode === 'all' || (item.mode || 'rent') === activeMode;
+        const matchCat = activeCategory === 'all' || item.category === activeCategory;
+        return matchMode && matchCat;
+      });
 
       const fallbackSvg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='%23333' viewBox='0 0 16 16'><path d='M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z'/></svg>";
 
       items.forEach(item => {
-        const status = calculateStatus(item.stock || 0, item.activeRents || []);
+        const mode = item.mode || 'rent';
+        const status = calculateStatus(item);
         const primaryCdnUrl = `https://resources.azgames-cdn.ru/projects/arizona-rp/assets/images/donate/128/${item.id}.webp`;
+
+        const badgeText = mode === 'rent' ? 'Аренда' : (mode === 'sell' ? 'Продажа' : 'Скупка');
+        const badgeClass = `mode-${mode}`;
+
+        let interactionBlock = '';
+        let initialCash = '—';
+        let initialAzp = '—';
+
+        if (mode === 'rent') {
+          interactionBlock = `
+            <div class="period-list">
+              <button class="period-btn active" onclick="setPeriod('${item.id}', 'd1', this)">24H</button>
+              <button class="period-btn" onclick="setPeriod('${item.id}', 'd7', this)">7D</button>
+              <button class="period-btn" onclick="setPeriod('${item.id}', 'd30', this)">30D</button>
+            </div>
+          `;
+          initialCash = item.rates?.d1?.cash || '—';
+          initialAzp = item.rates?.d1?.azp || '—';
+        } else {
+          interactionBlock = `
+            <div class="deal-label-box">
+              ${mode === 'sell' ? 'Цена за 1 шт.' : 'Цена скупки за 1 шт.'}
+            </div>
+          `;
+          initialCash = item.price?.cash || '—';
+          initialAzp = item.price?.azp || '—';
+        }
 
         const card = document.createElement('div');
         card.className = 'card';
@@ -450,7 +514,10 @@
 
         card.innerHTML = `
           <div class="card-meta">
-            <span class="item-id">#${item.id}</span>
+            <div class="meta-left">
+              <span class="item-id">#${item.id}</span>
+              <span class="mode-badge ${badgeClass}">${badgeText}</span>
+            </div>
             <div class="item-stock ${status.className}">
               <span class="stock-main">${status.main}</span>
               ${status.sub ? `<span class="stock-sub">${status.sub}</span>` : ''}
@@ -472,20 +539,16 @@
           </div>
 
           <div class="item-bottom">
-            <div class="period-list">
-              <button class="period-btn active" onclick="setPeriod('${item.id}', 'd1', this)">24H</button>
-              <button class="period-btn" onclick="setPeriod('${item.id}', 'd7', this)">7D</button>
-              <button class="period-btn" onclick="setPeriod('${item.id}', 'd30', this)">30D</button>
-            </div>
+            ${interactionBlock}
 
             <div class="pricing-table">
               <div class="price-row">
                 <span class="price-name">Вирты</span>
-                <span class="price-val-cash" id="cash-${item.id}">${item.rates?.d1?.cash || '—'}</span>
+                <span class="price-val-cash" id="cash-${item.id}">${initialCash}</span>
               </div>
               <div class="price-row">
                 <span class="price-name">АЗП</span>
-                <span class="price-val-azp" id="azp-${item.id}">${item.rates?.d1?.azp || '—'}</span>
+                <span class="price-val-azp" id="azp-${item.id}">${initialAzp}</span>
               </div>
             </div>
           </div>
@@ -507,9 +570,16 @@
       document.getElementById(`azp-${id}`).textContent = item.rates[period]?.azp || '—';
     }
 
-    function setFilter(cat, el) {
-      activeFilter = cat;
-      document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    function setMode(mode, el) {
+      activeMode = mode;
+      document.querySelectorAll('#mode-tabs .tab').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      render();
+    }
+
+    function setCategory(cat, el) {
+      activeCategory = cat;
+      document.querySelectorAll('#cat-tabs .tab').forEach(b => b.classList.remove('active'));
       el.classList.add('active');
       render();
     }
