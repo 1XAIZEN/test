@@ -3,6 +3,7 @@
     "id": "5929",
     "title": "Очки «ADMIN»",
     "category": "accessory",
+    "mode": "rent",
     "image": "./5929.png",
     "stock": 6,
     "activeRents": [
@@ -20,6 +21,7 @@
     "id": "5888",
     "title": "Ледяная скорбь",
     "category": "accessory",
+    "mode": "rent",
     "image": "./5888.png",
     "stock": 6,
     "activeRents": [
@@ -39,6 +41,7 @@
     "id": "6039",
     "title": "Админ-2 [Ж]",
     "category": "skin",
+    "mode": "rent",
     "image": "./6039.png",
     "stock": 3,
     "activeRents": [],
@@ -53,6 +56,7 @@
     "id": "6041",
     "title": "Админ-2 [М] Синий",
     "category": "skin",
+    "mode": "rent",
     "image": "./6041.png",
     "stock": 1,
     "activeRents": [
@@ -69,6 +73,7 @@
     "id": "6042",
     "title": "Админ-3 [М] Чёрный",
     "category": "skin",
+    "mode": "rent",
     "image": "./6042.png",
     "stock": 1,
     "activeRents": [
@@ -79,6 +84,19 @@
       "d1": { "azp": "15 АЗП", "cash": "7.000.000 $" },
       "d7": { "azp": "105 АЗП", "cash": "48.000.000 $" },
       "d30": { "azp": "450 АЗП", "cash": "210.000.000 $" }
+    }
+  },
+  {
+    "id": "1425",
+    "title": "Платиновая рулетка",
+    "category": "other",
+    "mode": "sell",
+    "image": "./1425.png",
+    "stock": 189,
+    "description": "Используется для получения рандомного товара из списка рулетки, а также <strong>LUXE автомобилей</strong>.",
+    "price": {
+      "cash": "1.000.000 $",
+      "azp": "—"
     }
   }
 ]
