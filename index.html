@@ -83,8 +83,16 @@
     .controls-container {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
       margin-bottom: 40px;
+    }
+
+    .toolbar-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
     }
 
     .nav-tabs {
@@ -132,6 +140,47 @@
       color: var(--text-dim);
     }
 
+    /* Поле поиска */
+    .search-wrapper {
+      position: relative;
+      min-width: 260px;
+      flex-grow: 1;
+      max-width: 380px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 9999px;
+      padding: 7px 16px 7px 36px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 12px;
+      outline: none;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--line-hover);
+      background: var(--surface-subtle);
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 13px;
+      height: 13px;
+      fill: var(--text-muted);
+      pointer-events: none;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -143,6 +192,21 @@
       .grid {
         grid-template-columns: 1fr;
       }
+      .search-wrapper {
+        max-width: 100%;
+        min-width: 100%;
+      }
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      padding: 64px 24px;
+      text-align: center;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text-muted);
     }
 
     .card {
@@ -360,7 +424,7 @@
         <h1 class="brand-title">Торговля и аренда</h1>
       </div>
 
-      <!-- Вкладки типов операций -->
+      <!-- Вкладки режимов -->
       <div class="nav-tabs" id="mode-tabs">
         <button class="tab active" onclick="setMode('all', this)">Все <span class="count" id="m-all"></span></button>
         <button class="tab" onclick="setMode('rent', this)">Аренда <span class="count" id="m-rent"></span></button>
@@ -369,13 +433,29 @@
       </div>
     </header>
 
-    <!-- Вкладки категорий предметов -->
     <div class="controls-container">
-      <div class="nav-tabs" id="cat-tabs">
-        <button class="tab active" onclick="setCategory('all', this)">Все категории</button>
-        <button class="tab" onclick="setCategory('accessory', this)">Аксессуары</button>
-        <button class="tab" onclick="setCategory('skin', this)">Скины</button>
-        <button class="tab" onclick="setCategory('other', this)">Прочее</button>
+      <div class="toolbar-row">
+        <!-- Вкладки категорий -->
+        <div class="nav-tabs" id="cat-tabs">
+          <button class="tab active" onclick="setCategory('all', this)">Все категории</button>
+          <button class="tab" onclick="setCategory('accessory', this)">Аксессуары</button>
+          <button class="tab" onclick="setCategory('skin', this)">Скины</button>
+          <button class="tab" onclick="setCategory('other', this)">Прочее</button>
+        </div>
+
+        <!-- Поле поиска -->
+        <div class="search-wrapper">
+          <svg class="search-icon" viewBox="0 0 16 16">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+          </svg>
+          <input 
+            type="text" 
+            class="search-input" 
+            id="search-input" 
+            placeholder="Поиск по названию или ID..." 
+            oninput="handleSearch(this.value)"
+          />
+        </div>
       </div>
     </div>
 
@@ -386,6 +466,7 @@
     let rawItems = [];
     let activeMode = 'all';
     let activeCategory = 'all';
+    let searchQuery = '';
 
     async function init() {
       try {
@@ -433,7 +514,6 @@
         };
       }
 
-      // Режим аренды
       const now = new Date();
       const validRents = (item.activeRents || [])
         .map(d => new Date(d))
@@ -464,6 +544,11 @@
       document.getElementById('m-buy').textContent = rawItems.filter(i => i.mode === 'buy').length;
     }
 
+    function handleSearch(val) {
+      searchQuery = val.trim().toLowerCase();
+      render();
+    }
+
     function render() {
       const container = document.getElementById('grid');
       container.innerHTML = '';
@@ -471,8 +556,17 @@
       const items = rawItems.filter(item => {
         const matchMode = activeMode === 'all' || (item.mode || 'rent') === activeMode;
         const matchCat = activeCategory === 'all' || item.category === activeCategory;
-        return matchMode && matchCat;
+        const matchSearch = !searchQuery || 
+          item.title.toLowerCase().includes(searchQuery) || 
+          String(item.id).toLowerCase().includes(searchQuery);
+
+        return matchMode && matchCat && matchSearch;
       });
+
+      if (items.length === 0) {
+        container.innerHTML = `<div class="empty-state">По вашему запросу ничего не найдено</div>`;
+        return;
+      }
 
       const fallbackSvg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='%23333' viewBox='0 0 16 16'><path d='M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z'/></svg>";
 
