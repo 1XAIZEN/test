@@ -1,1 +1,826 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mikki_Tyler | Лавка</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
+  <style>
+    :root {
+      --bg: #000000;
+      --surface: #0a0a0a;
+      --surface-subtle: #111111;
+      --line: #1f1f1f;
+      --line-hover: #333333;
+      
+      --text: #ededed;
+      --text-dim: #999999;
+      --text-muted: #666666;
+      
+      --green: #22c55e;
+      --yellow: #eab308;
+      --blue: #3b82f6;
+      --purple: #a855f7;
+
+      --font: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+      --mono: 'Geist Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      padding: 64px 24px 120px;
+      -webkit-font-smoothing: antialiased;
+      letter-spacing: -0.01em;
+    }
+
+    .wrapper {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .brand-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .system-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .brand-title {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .controls-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .toolbar-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      flex-grow: 1;
+      justify-content: flex-end;
+    }
+
+    .nav-tabs {
+      display: inline-flex;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 9999px;
+      padding: 3px;
+      gap: 2px;
+      width: fit-content;
+    }
+
+    .tab {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: color 0.15s ease, background 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tab .count {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .tab:hover {
+      color: var(--text);
+    }
+
+    .tab.active {
+      background: var(--surface-subtle);
+      color: var(--text);
+    }
+
+    .tab.active .count {
+      color: var(--text-dim);
+    }
+
+    .filter-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 9999px;
+      padding: 6px 14px;
+      font-size: 12px;
+      color: var(--text-dim);
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .filter-toggle:hover {
+      color: var(--text);
+      border-color: var(--line-hover);
+    }
+
+    .filter-toggle input {
+      display: none;
+    }
+
+    .toggle-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      transition: background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .filter-toggle input:checked + .toggle-dot {
+      background: var(--green);
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+    }
+
+    .filter-toggle.active {
+      color: var(--text);
+      background: var(--surface-subtle);
+      border-color: var(--line-hover);
+    }
+
+    .search-wrapper {
+      position: relative;
+      min-width: 240px;
+      flex-grow: 1;
+      max-width: 340px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 9999px;
+      padding: 7px 16px 7px 36px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 12px;
+      outline: none;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--line-hover);
+      background: var(--surface-subtle);
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 13px;
+      height: 13px;
+      fill: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      border-top: 1px solid var(--line);
+      border-left: 1px solid var(--line);
+    }
+
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      .toolbar-actions {
+        width: 100%;
+        justify-content: stretch;
+      }
+      .search-wrapper {
+        min-width: 100%;
+        max-width: 100%;
+      }
+      .filter-toggle {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      padding: 64px 24px;
+      text-align: center;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .card {
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      position: relative;
+      transition: background 0.2s ease;
+    }
+
+    .card:hover {
+      background: var(--surface);
+    }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .meta-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .item-id {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .mode-badge {
+      font-family: var(--mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .mode-rent { background: rgba(34, 197, 94, 0.1); color: var(--green); border: 1px solid rgba(34, 197, 94, 0.2); }
+    .mode-sell { background: rgba(59, 130, 246, 0.1); color: var(--blue); border: 1px solid rgba(59, 130, 246, 0.2); }
+    .mode-buy { background: rgba(168, 85, 247, 0.1); color: var(--purple); border: 1px solid rgba(168, 85, 247, 0.2); }
+
+    .item-stock {
+      font-family: var(--mono);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      text-align: right;
+      line-height: 1.4;
+    }
+
+    .stock-main {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .stock-main::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      flex-shrink: 0;
+    }
+
+    .stock-sub {
+      font-size: 11.5px;
+      color: var(--text-dim);
+      margin-top: 4px;
+      letter-spacing: -0.01em;
+    }
+
+    .item-stock.rented .stock-main { color: var(--yellow); }
+    .item-stock.rented .stock-main::before { background: var(--yellow); }
+    .item-stock.empty .stock-main { color: var(--text-muted); }
+    .item-stock.empty .stock-main::before { background: var(--text-muted); }
+
+    .image-stage {
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .image-stage img {
+      max-height: 110px;
+      max-width: 110px;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.9));
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover .image-stage img {
+      transform: scale(1.05);
+    }
+
+    .card-content {
+      margin-bottom: 28px;
+    }
+
+    .item-name {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .item-desc {
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: var(--text-dim);
+      min-height: 38px;
+    }
+
+    .item-bottom {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .period-list {
+      display: flex;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 2px;
+      background: var(--surface);
+    }
+
+    .period-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 5px 0;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .period-btn:hover { color: var(--text); }
+    .period-btn.active { background: var(--surface-subtle); color: var(--text); }
+
+    .deal-label-box {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 6px;
+      background: var(--surface);
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .pricing-table {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .price-name {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-family: var(--mono);
+      letter-spacing: 0.05em;
+    }
+
+    .price-val-cash {
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .price-val-azp {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+    <header>
+      <div class="brand-group">
+        <span class="system-label">Mikki Tyler | Лавка</span>
+        <h1 class="brand-title">Торговля и аренда</h1>
+      </div>
+
+      <div class="nav-tabs" id="mode-tabs">
+        <button class="tab active" onclick="setMode('all', this)">Все <span class="count" id="m-all"></span></button>
+        <button class="tab" onclick="setMode('rent', this)">Аренда <span class="count" id="m-rent"></span></button>
+        <button class="tab" onclick="setMode('sell', this)">Продажа <span class="count" id="m-sell"></span></button>
+        <button class="tab" onclick="setMode('buy', this)">Скупка <span class="count" id="m-buy"></span></button>
+      </div>
+    </header>
+
+    <div class="controls-container">
+      <div class="toolbar-row">
+        <div class="nav-tabs" id="cat-tabs">
+          <button class="tab active" onclick="setCategory('all', this)">Все категории</button>
+          <button class="tab" onclick="setCategory('accessory', this)">Аксессуары</button>
+          <button class="tab" onclick="setCategory('skin', this)">Скины</button>
+          <button class="tab" onclick="setCategory('other', this)">Прочее</button>
+        </div>
+
+        <div class="toolbar-actions">
+          <label class="filter-toggle" id="in-stock-label">
+            <input type="checkbox" id="in-stock-checkbox" onchange="toggleInStock(this.checked)">
+            <span class="toggle-dot"></span>
+            Только в наличии
+          </label>
+
+          <div class="search-wrapper">
+            <svg class="search-icon" viewBox="0 0 16 16">
+              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+            </svg>
+            <input 
+              type="text" 
+              class="search-input" 
+              id="search-input" 
+              placeholder="Поиск по названию или ID..." 
+              oninput="handleSearch(this.value)"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <script>
+    let rawItems = [];
+    let activeMode = 'all';
+    let activeCategory = 'all';
+    let searchQuery = '';
+    let onlyInStock = false;
+
+    function cleanName(str) {
+      return (str || '')
+        .toLowerCase()
+        .replace(/«|»|"|'|\s+/g, ' ')
+        .trim();
+    }
+
+    async function init() {
+      try {
+        const [localRes, apiRes] = await Promise.all([
+          fetch(`./items.json?t=${Date.now()}`, { cache: 'no-store' }),
+          fetch('https://server-api.arizona.games/client/json/table/get?project=arizona&server=0&key=inventory_items').catch(() => null)
+        ]);
+
+        const localItems = await localRes.json();
+        let apiItems = [];
+        if (apiRes && apiRes.ok) {
+          apiItems = await apiRes.json();
+        }
+
+        const nameMap = new Map();
+        const idMap = new Map();
+
+        apiItems.forEach(item => {
+          if (item.name) nameMap.set(cleanName(item.name), item);
+          if (item.id !== undefined) idMap.set(String(item.id), item);
+        });
+
+        rawItems = localItems.map(item => {
+          const apiMatch = (item.id && idMap.get(String(item.id))) || nameMap.get(cleanName(item.title));
+
+          let resolvedId = item.id;
+          let resolvedIcon = item.image || null;
+          let resolvedCategory = item.category;
+
+          if (apiMatch) {
+            resolvedId = resolvedId || String(apiMatch.id);
+            resolvedIcon = apiMatch.icon || resolvedIcon;
+
+            if (!resolvedCategory) {
+              if (apiMatch.type === 8) {
+                resolvedCategory = 'skin';
+              } else if (apiMatch.acs_slot !== undefined && apiMatch.acs_slot >= 0) {
+                resolvedCategory = 'accessory';
+              } else {
+                resolvedCategory = 'other';
+              }
+            }
+          }
+
+          return {
+            ...item,
+            id: resolvedId || '???',
+            iconFile: resolvedIcon,
+            category: resolvedCategory || 'other'
+          };
+        });
+
+        updateCounters();
+        render();
+      } catch (e) {
+        console.error('Ошибка инициализации данных:', e);
+      }
+    }
+
+    function formatTimeLeft(targetDate) {
+      const diffMs = targetDate - new Date();
+      if (diffMs <= 0) return 'прямо сейчас';
+
+      const diffMins = Math.floor(diffMs / 60000);
+      const days = Math.floor(diffMins / (60 * 24));
+      const hours = Math.floor((diffMins % (60 * 24)) / 60);
+      const mins = diffMins % 60;
+
+      if (days > 0) return hours > 0 ? `через ${days} д ${hours} ч` : `через ${days} д`;
+      if (hours > 0) return mins > 0 ? `через ${hours} ч ${mins} мин` : `через ${hours} ч`;
+      return `через ${mins} мин`;
+    }
+
+    function getAvailableStock(item) {
+      const mode = item.mode || 'rent';
+      if (mode === 'buy') return item.targetStock || 0;
+      if (mode === 'sell') return item.stock || 0;
+
+      const now = new Date();
+      const validRents = (item.activeRents || [])
+        .map(d => new Date(d))
+        .filter(d => !isNaN(d) && d > now);
+      return Math.max(0, (item.stock || 0) - validRents.length);
+    }
+
+    function calculateStatus(item) {
+      const mode = item.mode || 'rent';
+
+      if (mode === 'buy') {
+        return {
+          main: `Куплю: ${item.targetStock || 1} шт.`,
+          sub: 'Выкуп сразу',
+          className: ''
+        };
+      }
+
+      if (mode === 'sell') {
+        const stock = item.stock || 0;
+        if (stock === 0) return { main: 'Распродано', sub: '', className: 'empty' };
+        return {
+          main: `В наличии: ${stock} шт.`,
+          sub: 'Штучная продажа',
+          className: ''
+        };
+      }
+
+      const now = new Date();
+      const validRents = (item.activeRents || [])
+        .map(d => new Date(d))
+        .filter(d => !isNaN(d) && d > now)
+        .sort((a, b) => a - b);
+
+      const totalStock = item.stock || 0;
+      const rentedCount = validRents.length;
+      const availableStock = Math.max(0, totalStock - rentedCount);
+      const nextDate = validRents.length > 0 ? validRents[0] : null;
+
+      if (availableStock === 0 && nextDate) {
+        return { main: 'Все заняты', sub: `Слетит ${formatTimeLeft(nextDate)}`, className: 'rented' };
+      }
+      if (availableStock === 0) {
+        return { main: 'Нет в наличии', sub: '', className: 'empty' };
+      }
+      if (rentedCount > 0) {
+        return { main: `В наличии: ${availableStock} из ${totalStock} шт.`, sub: `Слетит ${formatTimeLeft(nextDate)}`, className: '' };
+      }
+      return { main: `В наличии: ${availableStock} шт.`, sub: '', className: '' };
+    }
+
+    function updateCounters() {
+      document.getElementById('m-all').textContent = rawItems.length;
+      document.getElementById('m-rent').textContent = rawItems.filter(i => (i.mode || 'rent') === 'rent').length;
+      document.getElementById('m-sell').textContent = rawItems.filter(i => i.mode === 'sell').length;
+      document.getElementById('m-buy').textContent = rawItems.filter(i => i.mode === 'buy').length;
+    }
+
+    function handleSearch(val) {
+      searchQuery = cleanName(val);
+      render();
+    }
+
+    function toggleInStock(checked) {
+      onlyInStock = checked;
+      const label = document.getElementById('in-stock-label');
+      label.classList.toggle('active', checked);
+      render();
+    }
+
+    function render() {
+      const container = document.getElementById('grid');
+      container.innerHTML = '';
+
+      const items = rawItems.filter(item => {
+        const matchMode = activeMode === 'all' || (item.mode || 'rent') === activeMode;
+        const matchCat = activeCategory === 'all' || item.category === activeCategory;
+        const matchSearch = !searchQuery || 
+          cleanName(item.title).includes(searchQuery) || 
+          String(item.id).toLowerCase().includes(searchQuery);
+        
+        const matchStock = !onlyInStock || getAvailableStock(item) > 0;
+
+        return matchMode && matchCat && matchSearch && matchStock;
+      });
+
+      if (items.length === 0) {
+        container.innerHTML = `<div class="empty-state">Ничего не найдено</div>`;
+        return;
+      }
+
+      const fallbackSvg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='%23333' viewBox='0 0 16 16'><path d='M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z'/></svg>";
+
+      items.forEach(item => {
+        const mode = item.mode || 'rent';
+        const status = calculateStatus(item);
+
+        const iconTarget = item.iconFile ? (item.iconFile.endsWith('.webp') ? item.iconFile : `${item.iconFile}.webp`) : `${item.id}.webp`;
+        const primaryCdnUrl = `https://resources.azgames-cdn.ru/projects/arizona-rp/assets/images/donate/128/${iconTarget}`;
+
+        const badgeText = mode === 'rent' ? 'Аренда' : (mode === 'sell' ? 'Продажа' : 'Скупка');
+        const badgeClass = `mode-${mode}`;
+
+        let interactionBlock = '';
+        let initialCash = '—';
+        let initialAzp = '—';
+
+        if (mode === 'rent') {
+          interactionBlock = `
+            <div class="period-list">
+              <button class="period-btn active" onclick="setPeriod('${item.id}', 'd1', this)">24H</button>
+              <button class="period-btn" onclick="setPeriod('${item.id}', 'd7', this)">7D</button>
+              <button class="period-btn" onclick="setPeriod('${item.id}', 'd30', this)">30D</button>
+            </div>
+          `;
+          initialCash = item.rates?.d1?.cash || '—';
+          initialAzp = item.rates?.d1?.azp || '—';
+        } else {
+          interactionBlock = `
+            <div class="deal-label-box">
+              ${mode === 'sell' ? 'Цена за 1 шт.' : 'Цена скупки за 1 шт.'}
+            </div>
+          `;
+          initialCash = item.price?.cash || '—';
+          initialAzp = item.price?.azp || '—';
+        }
+
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.id = `card-${item.id}`;
+
+        card.innerHTML = `
+          <div class="card-meta">
+            <div class="meta-left">
+              <span class="item-id">#${item.id}</span>
+              <span class="mode-badge ${badgeClass}">${badgeText}</span>
+            </div>
+            <div class="item-stock ${status.className}">
+              <span class="stock-main">${status.main}</span>
+              ${status.sub ? `<span class="stock-sub">${status.sub}</span>` : ''}
+            </div>
+          </div>
+
+          <div class="image-stage">
+            <img 
+              src="${primaryCdnUrl}" 
+              alt="${item.title}" 
+              loading="lazy"
+              onerror="if (this.src !== '${item.image || ''}' && '${item.image || ''}') { this.src = '${item.image}'; } else { this.src = '${fallbackSvg}'; }"
+            />
+          </div>
+
+          <div class="card-content">
+            <h2 class="item-name">${item.title}</h2>
+            <p class="item-desc">${item.description || ''}</p>
+          </div>
+
+          <div class="item-bottom">
+            ${interactionBlock}
+
+            <div class="pricing-table">
+              <div class="price-row">
+                <span class="price-name">Вирты</span>
+                <span class="price-val-cash" id="cash-${item.id}">${initialCash}</span>
+              </div>
+              <div class="price-row">
+                <span class="price-name">АЗП</span>
+                <span class="price-val-azp" id="azp-${item.id}">${initialAzp}</span>
+              </div>
+            </div>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function setPeriod(id, period, el) {
+      const item = rawItems.find(i => String(i.id) === String(id));
+      if (!item || !item.rates) return;
+
+      const card = el.closest('.card');
+      card.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+
+      document.getElementById(`cash-${id}`).textContent = item.rates[period]?.cash || '—';
+      document.getElementById(`azp-${id}`).textContent = item.rates[period]?.azp || '—';
+    }
+
+    function setMode(mode, el) {
+      activeMode = mode;
+      document.querySelectorAll('#mode-tabs .tab').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      render();
+    }
+
+    function setCategory(cat, el) {
+      activeCategory = cat;
+      document.querySelectorAll('#cat-tabs .tab').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      render();
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
