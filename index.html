@@ -194,7 +194,6 @@
       flex-shrink: 0;
     }
 
-    /* Увеличенный и более контрастный текст времени */
     .stock-sub {
       font-size: 11.5px;
       color: var(--text-dim);
@@ -394,7 +393,6 @@
       const availableStock = Math.max(0, totalStock - rentedCount);
       const nextDate = validRents.length > 0 ? validRents[0] : null;
 
-      // 1. Все сдано в аренду (в наличии 0, но скоро освободится)
       if (availableStock === 0 && nextDate) {
         return {
           main: 'Все заняты',
@@ -403,7 +401,6 @@
         };
       }
 
-      // 2. Нет в наличии вообще (пустой склад)
       if (availableStock === 0) {
         return {
           main: 'Нет в наличии',
@@ -412,7 +409,6 @@
         };
       }
 
-      // 3. Часть доступна, часть в аренде
       if (rentedCount > 0) {
         return {
           main: `В наличии: ${availableStock} из ${totalStock} шт.`,
@@ -421,7 +417,6 @@
         };
       }
 
-      // 4. Свободно всё
       return {
         main: `В наличии: ${availableStock} шт.`,
         sub: '',
@@ -443,8 +438,11 @@
         ? rawItems 
         : rawItems.filter(i => i.category === activeFilter);
 
+      const fallbackSvg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='%23333' viewBox='0 0 16 16'><path d='M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z'/></svg>";
+
       items.forEach(item => {
         const status = calculateStatus(item.stock || 0, item.activeRents || []);
+        const primaryCdnUrl = `https://resources.azgames-cdn.ru/projects/arizona-rp/assets/images/donate/128/${item.id}.webp`;
 
         const card = document.createElement('div');
         card.className = 'card';
@@ -460,7 +458,12 @@
           </div>
 
           <div class="image-stage">
-            <img src="${item.image}" alt="${item.title}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'32\\' height=\\'32\\' fill=\\'%23333\\' viewBox=\\'0 0 16 16\\'><path d=\\'M3 5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H3z\\'/></svg>'"/>
+            <img 
+              src="${primaryCdnUrl}" 
+              alt="${item.title}" 
+              loading="lazy"
+              onerror="if (this.src !== '${item.image || ''}' && '${item.image || ''}') { this.src = '${item.image}'; } else { this.src = '${fallbackSvg}'; }"
+            />
           </div>
 
           <div class="card-content">
