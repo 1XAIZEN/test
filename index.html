@@ -149,7 +149,6 @@
       color: var(--text-dim);
     }
 
-    /* Тумблер "В наличии" */
     .filter-toggle {
       display: inline-flex;
       align-items: center;
@@ -179,7 +178,7 @@
       height: 7px;
       border-radius: 50%;
       background: var(--text-muted);
-      transition: background 0.2s ease, transform 0.2s ease;
+      transition: background 0.2s ease, box-shadow 0.2s ease;
     }
 
     .filter-toggle input:checked + .toggle-dot {
@@ -193,7 +192,6 @@
       border-color: var(--line-hover);
     }
 
-    /* Поле поиска */
     .search-wrapper {
       position: relative;
       min-width: 240px;
@@ -485,7 +483,6 @@
         <h1 class="brand-title">Торговля и аренда</h1>
       </div>
 
-      <!-- Вкладки режимов -->
       <div class="nav-tabs" id="mode-tabs">
         <button class="tab active" onclick="setMode('all', this)">Все <span class="count" id="m-all"></span></button>
         <button class="tab" onclick="setMode('rent', this)">Аренда <span class="count" id="m-rent"></span></button>
@@ -496,7 +493,6 @@
 
     <div class="controls-container">
       <div class="toolbar-row">
-        <!-- Вкладки категорий -->
         <div class="nav-tabs" id="cat-tabs">
           <button class="tab active" onclick="setCategory('all', this)">Все категории</button>
           <button class="tab" onclick="setCategory('accessory', this)">Аксессуары</button>
@@ -504,7 +500,6 @@
           <button class="tab" onclick="setCategory('other', this)">Прочее</button>
         </div>
 
-        <!-- Правая часть панели: тумблер и поиск -->
         <div class="toolbar-actions">
           <label class="filter-toggle" id="in-stock-label">
             <input type="checkbox" id="in-stock-checkbox" onchange="toggleInStock(this.checked)">
@@ -538,14 +533,68 @@
     let searchQuery = '';
     let onlyInStock = false;
 
+    function cleanName(str) {
+      return (str || '')
+        .toLowerCase()
+        .replace(/«|»|"|'|\s+/g, ' ')
+        .trim();
+    }
+
     async function init() {
       try {
-        const res = await fetch(`./items.json?t=${Date.now()}`, { cache: 'no-store' });
-        rawItems = await res.json();
+        const [localRes, apiRes] = await Promise.all([
+          fetch(`./items.json?t=${Date.now()}`, { cache: 'no-store' }),
+          fetch('https://server-api.arizona.games/client/json/table/get?project=arizona&server=0&key=inventory_items').catch(() => null)
+        ]);
+
+        const localItems = await localRes.json();
+        let apiItems = [];
+        if (apiRes && apiRes.ok) {
+          apiItems = await apiRes.json();
+        }
+
+        const nameMap = new Map();
+        const idMap = new Map();
+
+        apiItems.forEach(item => {
+          if (item.name) nameMap.set(cleanName(item.name), item);
+          if (item.id !== undefined) idMap.set(String(item.id), item);
+        });
+
+        rawItems = localItems.map(item => {
+          const apiMatch = (item.id && idMap.get(String(item.id))) || nameMap.get(cleanName(item.title));
+
+          let resolvedId = item.id;
+          let resolvedIcon = item.image || null;
+          let resolvedCategory = item.category;
+
+          if (apiMatch) {
+            resolvedId = resolvedId || String(apiMatch.id);
+            resolvedIcon = apiMatch.icon || resolvedIcon;
+
+            if (!resolvedCategory) {
+              if (apiMatch.type === 8) {
+                resolvedCategory = 'skin';
+              } else if (apiMatch.acs_slot !== undefined && apiMatch.acs_slot >= 0) {
+                resolvedCategory = 'accessory';
+              } else {
+                resolvedCategory = 'other';
+              }
+            }
+          }
+
+          return {
+            ...item,
+            id: resolvedId || '???',
+            iconFile: resolvedIcon,
+            category: resolvedCategory || 'other'
+          };
+        });
+
         updateCounters();
         render();
       } catch (e) {
-        console.error(e);
+        console.error('Ошибка инициализации данных:', e);
       }
     }
 
@@ -565,13 +614,9 @@
 
     function getAvailableStock(item) {
       const mode = item.mode || 'rent';
-      if (mode === 'buy') {
-        return item.targetStock || 0;
-      }
-      if (mode === 'sell') {
-        return item.stock || 0;
-      }
-      // rent
+      if (mode === 'buy') return item.targetStock || 0;
+      if (mode === 'sell') return item.stock || 0;
+
       const now = new Date();
       const validRents = (item.activeRents || [])
         .map(d => new Date(d))
@@ -631,18 +676,14 @@
     }
 
     function handleSearch(val) {
-      searchQuery = val.trim().toLowerCase();
+      searchQuery = cleanName(val);
       render();
     }
 
     function toggleInStock(checked) {
       onlyInStock = checked;
       const label = document.getElementById('in-stock-label');
-      if (checked) {
-        label.classList.add('active');
-      } else {
-        label.classList.remove('active');
-      }
+      label.classList.toggle('active', checked);
       render();
     }
 
@@ -654,7 +695,7 @@
         const matchMode = activeMode === 'all' || (item.mode || 'rent') === activeMode;
         const matchCat = activeCategory === 'all' || item.category === activeCategory;
         const matchSearch = !searchQuery || 
-          item.title.toLowerCase().includes(searchQuery) || 
+          cleanName(item.title).includes(searchQuery) || 
           String(item.id).toLowerCase().includes(searchQuery);
         
         const matchStock = !onlyInStock || getAvailableStock(item) > 0;
@@ -672,7 +713,9 @@
       items.forEach(item => {
         const mode = item.mode || 'rent';
         const status = calculateStatus(item);
-        const primaryCdnUrl = `https://resources.azgames-cdn.ru/projects/arizona-rp/assets/images/donate/128/${item.id}.webp`;
+
+        const iconTarget = item.iconFile ? (item.iconFile.endsWith('.webp') ? item.iconFile : `${item.iconFile}.webp`) : `${item.id}.webp`;
+        const primaryCdnUrl = `https://resources.azgames-cdn.ru/projects/arizona-rp/assets/images/donate/128/${iconTarget}`;
 
         const badgeText = mode === 'rent' ? 'Аренда' : (mode === 'sell' ? 'Продажа' : 'Скупка');
         const badgeClass = `mode-${mode}`;
@@ -752,7 +795,7 @@
     }
 
     function setPeriod(id, period, el) {
-      const item = rawItems.find(i => i.id === id);
+      const item = rawItems.find(i => String(i.id) === String(id));
       if (!item || !item.rates) return;
 
       const card = el.closest('.card');
