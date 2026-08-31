@@ -92,7 +92,7 @@
     "category": "other",
     "mode": "sell",
     "image": "./1425.png",
-    "stock": 189,
+    "stock": 0,
     "description": "Используется для получения рандомного товара из списка рулетки, а также <strong>LUXE автомобилей</strong>.",
     "price": {
       "cash": "1.000.000 $",
