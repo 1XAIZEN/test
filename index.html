@@ -112,6 +112,7 @@
       padding: 3px;
       gap: 2px;
       width: fit-content;
+      flex-wrap: wrap;
     }
 
     .tab {
@@ -497,6 +498,8 @@
           <button class="tab active" onclick="setCategory('all', this)">Все категории</button>
           <button class="tab" onclick="setCategory('accessory', this)">Аксессуары</button>
           <button class="tab" onclick="setCategory('skin', this)">Скины</button>
+          <button class="tab" onclick="setCategory('potion', this)">Зелья</button>
+          <button class="tab" onclick="setCategory('nft', this)">NFT</button>
           <button class="tab" onclick="setCategory('other', this)">Прочее</button>
         </div>
 
@@ -509,7 +512,7 @@
 
           <div class="search-wrapper">
             <svg class="search-icon" viewBox="0 0 16 16">
-              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0 z"/>
             </svg>
             <input 
               type="text" 
@@ -568,6 +571,8 @@
           let resolvedIcon = item.image || null;
           let resolvedCategory = item.category;
 
+          const itemTitleLower = cleanName(item.title);
+
           if (apiMatch) {
             resolvedId = resolvedId || String(apiMatch.id);
             resolvedIcon = apiMatch.icon || resolvedIcon;
@@ -577,6 +582,21 @@
                 resolvedCategory = 'skin';
               } else if (apiMatch.acs_slot !== undefined && apiMatch.acs_slot >= 0) {
                 resolvedCategory = 'accessory';
+              } else if (itemTitleLower.includes('зелье') || itemTitleLower.includes('сироп') || itemTitleLower.includes('эликсир')) {
+                resolvedCategory = 'potion';
+              } else if (itemTitleLower.includes('nft') || itemTitleLower.includes('нфт') || itemTitleLower.includes('контейнер') || itemTitleLower.includes('монета')) {
+                resolvedCategory = 'nft';
+              } else {
+                resolvedCategory = 'other';
+              }
+            }
+          } else {
+            // Если в API нет совпадения, но в локальных данных категория не указана — проверяем по названию
+            if (!resolvedCategory) {
+              if (itemTitleLower.includes('зелье') || itemTitleLower.includes('сироп') || itemTitleLower.includes('эликсир')) {
+                resolvedCategory = 'potion';
+              } else if (itemTitleLower.includes('nft') || itemTitleLower.includes('нфт')) {
+                resolvedCategory = 'nft';
               } else {
                 resolvedCategory = 'other';
               }
